@@ -1,10 +1,18 @@
 public class Move {
 	public final int Start;
 	public final int Target;
+	public final char promotionChoice;
 
 	public Move(int start, int target) {
 		this.Start = start;
 		this.Target = target;
+		promotionChoice = '-';
+	}
+
+	public Move(int start, int target, char promotionChoice) {
+		this.Start = start;
+		this.Target = target;
+		this.promotionChoice = promotionChoice;
 	}
 
 	public Move(String move) {
@@ -14,9 +22,17 @@ public class Move {
 		int targetRank = move.charAt(3) - 49;
 		Start = 8 * startRank + startFile;
 		Target = 8 * targetRank + targetFile;
+
+		// promotion [frfr=p]
+		if (move.length() == 6) {
+			promotionChoice = move.charAt(5);
+		}
+		else {
+			promotionChoice = '-';
+		}
 	}
 
-	public String toSquare() {
+	public String toString() {
 		int startFileAscii = 97 + (Start % 8);
 		char startFile = (char) startFileAscii;
 		int startRank = Start / 8 + 1;
@@ -27,8 +43,7 @@ public class Move {
 
 		StringBuilder str = new StringBuilder();
 		str.append(startFile);
-		str.append(startRank);
-		str.append(" ");
+		str.append(startRank);		
 		str.append(targetFile);
 		str.append(targetRank);
 

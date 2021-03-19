@@ -6,9 +6,13 @@ public class Game {
 	Position position;
 	Stack<Board> history;	
 
+	public void loadFromFEN(String fen) {
+		position.loadFromFEN(fen);
+	}
+
 	public Game() {
 		position = new Position();
-		position.board.loadFromFEN(startFEN);
+		loadFromFEN(startFEN);
 		history = new Stack<Board>();
 	}
 }

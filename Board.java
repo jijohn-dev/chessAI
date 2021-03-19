@@ -1,15 +1,42 @@
 import java.util.*;
 
 public class Board {
-	public static final int bottomLeft = 0;
-	public static final int bottomRight = 7;
-	public static final int topLeft = 56;
-	public static final int topRight = 63;
+	public static final int A1 = 0;
+	public static final int B1 = 1;
+	public static final int C1 = 2;
+	public static final int D1 = 3;
+	public static final int E1 = 4;
+	public static final int F1 = 5;
+	public static final int G1 = 6;
+	public static final int H1 = 7;
+	public static final int A2 = 8;
+	public static final int B2 = 9;
+	public static final int C2 = 10;
+	public static final int D2 = 11;
+	public static final int E2 = 12;
+	public static final int F2 = 13;
+	public static final int G2 = 14;
+	public static final int H2 = 15;
+	public static final int A8 = 56;
+	public static final int B8 = 57;
+	public static final int C8 = 58;
+	public static final int D8 = 59;
+	public static final int E8 = 60;
+	public static final int F8 = 61;
+	public static final int G8 = 62;
+	public static final int H8 = 63;
 	
 	public int[] squares;
 
 	public Board() {
-		squares = new int[65];
+		squares = new int[64];
+	}
+
+	public Board(Board that) {
+		this.squares = new int[64];
+		for (int i = 0; i < 64; i++) {
+			this.squares[i] = that.squares[i];
+		}
 	}
 
 	public void printBoard() {
@@ -53,54 +80,5 @@ public class Board {
 		}
 
 		return c;
-	}
-
-	public void loadFromFEN(String fen) {
-		Map<Character, Integer> pieces = new HashMap<>();
-
-		pieces.put('p', Piece.Pawn);
-		pieces.put('b', Piece.Bishop);
-		pieces.put('n', Piece.Knight);
-		pieces.put('r', Piece.Rook);
-		pieces.put('q', Piece.Queen);
-		pieces.put('k', Piece.King);
-
-		// get board position portion of FEN string
-		String board = fen.split(" ")[0];
-
-		// start from 8th rank
-		int file = 0, rank = 7;
-
-		for (int i = 0; i < board.length(); i++) {
-			char c = board.charAt(i);
-
-			// move to next rank
-			if (c == '/') {
-				file = 0;
-				rank--;
-			} else {
-				// empty squares
-				if (Character.isDigit(c)) {
-					int n = Character.getNumericValue(c);
-					for (int j = 0; j < n; j++) {
-						squares[file + 8 * rank] = Piece.Empty;						
-					}
-				}
-				else {
-					int color = Character.isUpperCase(c) ? Piece.White : Piece.Black;
-					squares[file + 8 * rank] = pieces.get(Character.toLowerCase(c)) | color;					
-				}
-				file++;
-			}			
-		}
-	}
-
-	public static void main(String[] args) {
-		String startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";	
-
-		Board board = new Board();
-
-		board.loadFromFEN((startFEN));
-		board.printBoard();
-	}
+	}	
 }

@@ -1,20 +1,20 @@
 import chess
 import math
 
-def minimax(position, depth, alpha, beta, white):
+def minimax(position, depth, alpha, beta, white_to_move):
 	if depth == 0 or position.is_game_over():
-		return staticEval(position), 0
+		return staticEval(position), None
 
 	bestMove = None
 
-	if white:
+	if white_to_move:
 		maxEval = -math.inf
 		moves = position.legal_moves
-		for move in moves:
+		for move in moves:			
 			position.push(move)
 			childEval, best = minimax(position, depth - 1, alpha, beta, False)
 			position.pop()
-			if (childEval > maxEval):
+			if childEval > maxEval or childEval == -math.inf:
 				maxEval = childEval
 				bestMove = move
 			alpha = max(alpha, maxEval)
@@ -24,11 +24,11 @@ def minimax(position, depth, alpha, beta, white):
 	else:
 		minEval = math.inf
 		moves = position.legal_moves
-		for move in moves:
+		for move in moves:			
 			position.push(move)
 			childEval, best = minimax(position, depth - 1, alpha, beta, True)
 			position.pop()
-			if childEval < minEval:
+			if childEval < minEval or childEval == math.inf:
 				minEval = childEval
 				bestMove = move			
 			beta = min(beta, minEval)
