@@ -102,17 +102,17 @@ public class Position {
 			set(move.Target - 1, Piece.Rook | Piece.White);
 			set(Board.H1, Piece.Empty);
 		}
-		if (move.Start == Board.E1 && move.Target == Board.C2) {
+		if (move.Start == Board.E1 && move.Target == Board.C1) {
 			set(move.Target + 1, Piece.Rook | Piece.White);
 			set(Board.A1, Piece.Empty);
 		}
 		if (move.Start == Board.E8 && move.Target == Board.G8) {
 			set(move.Target - 1, Piece.Rook | Piece.Black);
-			set(Board.A8, Piece.Empty);
+			set(Board.H8, Piece.Empty);
 		}
 		if (move.Start == Board.E8 && move.Target == Board.C8) {
 			set(move.Target + 1, Piece.Rook | Piece.Black);
-			set(Board.H8, Piece.Empty);
+			set(Board.A8, Piece.Empty);
 		}	
 		
 		// update en passant target if applicable		
@@ -120,17 +120,23 @@ public class Position {
 			// en passant
 			int step = toMove == 'w' ? MoveData.Down : MoveData.Up;			
 			if (move.Target == enPassantTarget) {		
-				set(enPassantTarget + step, Piece.Empty);
-				enPassantTarget = -1;
+				set(enPassantTarget + step, Piece.Empty);				
 			}	
 			else if (Math.abs(move.Target - move.Start) == 2 * MoveData.Up) {
 				enPassantTarget = move.Start - step;
 			}
 			else if (move.promotionChoice != '-') {
-				set(move.Target, promotionInt(move.promotionChoice, toMove));
+				set(move.Target, promotionInt(move.promotionChoice, toMove));				
+			}
+
+			// reset en pass
+			if (Math.abs(move.Target - move.Start) != 2 * MoveData.Up) {
 				enPassantTarget = -1;
 			}
-		}		
+		}	
+		else {
+			enPassantTarget = -1;
+		}	
 
 		// update castling rights and king position
 		if (Piece.name(piece) == Piece.King) {
@@ -146,16 +152,16 @@ public class Position {
 			}
 		}
 		else if (Piece.name(piece) == Piece.Rook) {
-			if (move.Start == Board.A1) {
+			if (move.Start == Board.H1) {
 				castlingRights.whiteKingSide = false;
 			}
-			else if (move.Start == Board.H1) {
+			else if (move.Start == Board.A1) {
 				castlingRights.whiteQueenSide = false;
 			}
-			else if (move.Start == Board.A8) {
+			else if (move.Start == Board.H8) {
 				castlingRights.blackKingSide = false;
 			}
-			else if (move.Start == Board.H8) {
+			else if (move.Start == Board.A8) {
 				castlingRights.blackQueenSide = false;
 			}
 		}

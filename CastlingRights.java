@@ -15,7 +15,7 @@ public class CastlingRights {
 		this.whiteKingSide = that.whiteKingSide;
 		this.whiteQueenSide = that.whiteQueenSide;
 		this.blackKingSide = that.blackKingSide;
-		this.blackQueenSide = that.blackKingSide;
+		this.blackQueenSide = that.blackQueenSide;
 	}
 
 	public String fen() {

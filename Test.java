@@ -163,12 +163,16 @@ public class Test {
 		System.out.println();
 
 		// move generation correctness
-		System.out.println("Testing move generation correctness from position 5");
-		moveGenerationTest(4, pos5, "testDataPos5.txt");
+		String pos2 = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 1 20";
+		System.out.println("Testing move generation correctness from position 2");
+		moveGenerationTest(4, pos2, "testDataPos2.txt");
 
 		String pos3 = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 20";
 		System.out.println("Testing move generation correctness from position 3");
 		moveGenerationTest(4, pos3, "testDataPos3.txt");
+
+		System.out.println("Testing move generation correctness from position 5");
+		moveGenerationTest(4, pos5, "testDataPos5.txt");		
 
 		// Engine evaluation
 		System.out.println("Engine evaluation depth = " + engineDepth);		

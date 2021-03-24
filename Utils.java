@@ -105,7 +105,7 @@ public class Utils {
 		}
 
 		// castling		
-		if (pos.toMove == 'w' && !underAttack(pos, pos.whiteKing, 'b')) {
+		if (pos.toMove == 'w' && !underAttack(pos, pos.whiteKing, 'b')) {			
 			if (pos.castlingRights.whiteKingSide && pos.at(Board.H1) == (Piece.Rook | Piece.White)) {
 				if (pos.at(Board.F1) == Piece.Empty && pos.at(Board.G1) == Piece.Empty) {
 					if (!underAttack(pos, Board.F1, 'b') && !underAttack(pos, Board.G1, 'b')) {
@@ -113,15 +113,15 @@ public class Utils {
 					}				
 				}			
 			}
-			if (pos.castlingRights.whiteQueenSide && pos.at(Board.A1) == (Piece.Rook | Piece.White)) {
-				if (pos.at(Board.D1) == Piece.Empty && pos.at(Board.C1) == Piece.Empty) {
+			if (pos.castlingRights.whiteQueenSide && pos.at(Board.A1) == (Piece.Rook | Piece.White)) {				
+				if (pos.at(Board.B1) == Piece.Empty && pos.at(Board.C1) == Piece.Empty && pos.at(Board.D1) == Piece.Empty) {
 					if (!underAttack(pos, Board.D1, 'b') && !underAttack(pos, Board.C1, 'b')) {
 						moves.add(new Move(Board.E1, Board.C1));
 					}				
 				}
 			}
 		}	
-		else if (!underAttack(pos, pos.blackKing, 'w')){
+		else if (pos.toMove == 'b' && !underAttack(pos, pos.blackKing, 'w')){
 			if (pos.castlingRights.blackKingSide && pos.at(Board.H8) == (Piece.Rook | Piece.Black)) {
 				if (pos.at(Board.F8) == Piece.Empty && pos.at(Board.G8) == Piece.Empty) {
 					if (!underAttack(pos, Board.F8, 'w') && !underAttack(pos, Board.G8, 'w')) {
@@ -129,8 +129,8 @@ public class Utils {
 					}
 				}
 			}
-			if (pos.castlingRights.blackKingSide && pos.at(Board.A8) == (Piece.Rook | Piece.Black)) {
-				if (pos.at(Board.D8) == Piece.Empty && pos.at(Board.C8) == Piece.Empty) {
+			if (pos.castlingRights.blackQueenSide && pos.at(Board.A8) == (Piece.Rook | Piece.Black)) {
+				if (pos.at(Board.B8) == Piece.Empty && pos.at(Board.C8) == Piece.Empty && pos.at(Board.D8) == Piece.Empty) {
 					if (!underAttack(pos, Board.D8, 'w') && !underAttack(pos, Board.C8, 'w')) {
 						moves.add(new Move(Board.E8, Board.C8));
 					}	
@@ -159,7 +159,7 @@ public class Utils {
 	static boolean underAttack(Position pos, int square, char attackingColor) {
 		int pawnDirStart = pos.toMove == 'w' ? 6 : 4;
 		for (int dir = 0; dir < 8; dir++) {
-			int dist =  MoveData.DistanceToEdge[square][dir];			
+			int dist = MoveData.DistanceToEdge[square][dir];			
 			for (int steps = 1; steps <= dist; steps++) {
 				int squareIdx = square + steps * MoveData.Offsets[dir];											
 				if (Piece.isColor(pos.board.squares[squareIdx], Opposite(attackingColor))) {
@@ -185,6 +185,8 @@ public class Utils {
 				}
 			}						
 		}
+
+		// knights
 		for (int offset : MoveData.KnightOffsets.get(square)) {
 			if (Piece.isColor(pos.board.squares[square + offset], attackingColor)) {
 				if (Piece.name(pos.board.squares[square + offset]) == Piece.Knight) {
@@ -192,6 +194,26 @@ public class Utils {
 				}	
 			}			
 		}
+
+		// pawns
+		int step = attackingColor == 'w' ? MoveData.Down : MoveData.Up;
+		int left = attackingColor == 'w' ? 7 : 4;
+		int right = attackingColor == 'w' ? 6 : 5;
+		if (MoveData.DistanceToEdge[square][left] > 0) {
+			if (Piece.isColor(pos.board.squares[square + step - 1], attackingColor)) {
+				if (Piece.name(pos.board.squares[square + step - 1]) == Piece.Pawn) {
+					return true;
+				}	
+			}
+		}
+		if (MoveData.DistanceToEdge[square][right] > 0) {
+			if (Piece.isColor(pos.board.squares[square + step + 1], attackingColor)) {
+				if (Piece.name(pos.board.squares[square + step + 1]) == Piece.Pawn) {
+					return true;
+				}	
+			}
+		}		
+
 		return false;
 	}	
 
@@ -206,25 +228,24 @@ public class Utils {
 	}
 
 	public static void main(String[] args) {
-		Position pos = new Position("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
-		
-		pos.makeMove(new Move("c4f7"));		
-		System.out.println(pos.blackKing);
+		Position pos = new Position("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");	
 
-		pos.makeMove(new Move("f2g4"));
-		System.out.println(pos.blackKing);
+		// castling
+		pos = new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 1 20");
 
-		pos.undoMove();
-		System.out.println(pos.blackKing);
-
-		// en pass
-		pos = new Position();
-		pos.makeMove(new Move("g2g4"));
-		pos.makeMove(new Move("g8h6"));
+		System.out.println(pos.castlingRights.fen()); // KQkq
+		pos.makeMove(new Move("e5f7"));
+		System.out.println(pos.castlingRights.fen()); // KQkq
+		pos.makeMove(new Move("h8g8"));
+		System.out.println(pos.castlingRights.fen()); // KQq
+		pos.makeMove(new Move("f7h8"));			
+		System.out.println(pos.castlingRights.fen()); // KQ
 
 		List<Move> legalMoves = generateLegalMoves(pos);
 		for (Move move : legalMoves) {
-			System.out.println(move);
+			if (move.toString().equals("e8c8")) {
+				System.out.println("queenside");
+			}
 		}
 	}
 }
