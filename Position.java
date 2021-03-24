@@ -31,10 +31,35 @@ public class Position {
 
 		whiteKing = 4;
 		blackKing = 60;
+
+		loadFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0");
+	}
+
+	public Position(String fen) {
+		board = new Board();
+		enPassantTarget = -1;
+		toMove = 'w';
+		castlingRights = new CastlingRights("KQkq");
+		halfMoveCount = 0;
+		moveCount = 1;
+
+		stack = new Stack<>();
+		castlingStack = new Stack<>();
+		enPassStack = new Stack<>();
+		halfMoveStack = new Stack<>();		
+
+		whiteKing = 4;
+		blackKing = 60;
+
+		loadFromFEN(fen);
 	}
 
 	public void set(int square, int val) {
 		board.squares[square] = val;
+	}
+
+	public int at(int square) {
+		return board.squares[square];
 	}
 
 	public boolean equals(Position that) {
@@ -61,7 +86,7 @@ public class Position {
 		enPassStack.push(enPassantTarget);
 
 		halfMoveStack.push(halfMoveCount);
-		if (toMove == 'w') {
+		if (toMove == 'b') {
 			// TODO: check for pawn move or capture			
 			halfMoveCount++;
 		}
@@ -70,41 +95,42 @@ public class Position {
 		// update board
 		int piece = board.squares[move.Start];
 		set(move.Target, piece);
-		set(move.Start, 0);				
-
+		set(move.Start, Piece.Empty);
+		
 		// castling
-		if (castlingRights.whiteKingSide && move.Start == Board.E1 && move.Target == Board.G1) {
-			set(move.Target - 1, Piece.Rook);
+		if (move.Start == Board.E1 && move.Target == Board.G1) {
+			set(move.Target - 1, Piece.Rook | Piece.White);
 			set(Board.H1, Piece.Empty);
 		}
-		if (castlingRights.whiteQueenSide && move.Start == Board.E1 && move.Target == Board.C2) {
-			set(move.Target + 1, Piece.Rook);
+		if (move.Start == Board.E1 && move.Target == Board.C2) {
+			set(move.Target + 1, Piece.Rook | Piece.White);
 			set(Board.A1, Piece.Empty);
 		}
-		if (castlingRights.blackKingSide && move.Start == Board.E8 && move.Target == Board.G8) {
-			set(move.Target - 1, Piece.Rook);
+		if (move.Start == Board.E8 && move.Target == Board.G8) {
+			set(move.Target - 1, Piece.Rook | Piece.Black);
 			set(Board.A8, Piece.Empty);
 		}
-		if (castlingRights.blackQueenSide && move.Start == Board.E8 && move.Target == Board.C8) {
-			set(move.Target + 1, Piece.Rook);
+		if (move.Start == Board.E8 && move.Target == Board.C8) {
+			set(move.Target + 1, Piece.Rook | Piece.Black);
 			set(Board.H8, Piece.Empty);
 		}	
 		
-		// update en passant target if applicable
-		enPassantTarget = -1;
+		// update en passant target if applicable		
 		if (Piece.name(piece) == Piece.Pawn) {
 			// en passant
-			if (move.Target == enPassantTarget) {
-				int step = toMove == 'w' ? 1 : -1;
+			int step = toMove == 'w' ? MoveData.Down : MoveData.Up;			
+			if (move.Target == enPassantTarget) {		
 				set(enPassantTarget + step, Piece.Empty);
+				enPassantTarget = -1;
 			}	
 			else if (Math.abs(move.Target - move.Start) == 2 * MoveData.Up) {
-				enPassantTarget = toMove == 'w' ? move.Start + MoveData.Up : move.Start + MoveData.Down;
+				enPassantTarget = move.Start - step;
 			}
 			else if (move.promotionChoice != '-') {
 				set(move.Target, promotionInt(move.promotionChoice, toMove));
+				enPassantTarget = -1;
 			}
-		}
+		}		
 
 		// update castling rights and king position
 		if (Piece.name(piece) == Piece.King) {
@@ -134,8 +160,7 @@ public class Position {
 			}
 		}
 
-		toMove = toMove == 'w' ? 'b' : 'w';
-		setKings();
+		toMove = toMove == 'w' ? 'b' : 'w';		
 	}
 
 	public void undoMove() {
@@ -186,27 +211,31 @@ public class Position {
 		int file = 0, rank = 7;
 
 		for (int i = 0; i < boardFen.length(); i++) {
-			char c = boardFen.charAt(i);
+			char c = boardFen.charAt(i);			
 
 			// move to next rank
 			if (c == '/') {
 				file = 0;
 				rank--;
-			} else {
+			} 
+			else {
 				// empty squares
-				if (Character.isDigit(c)) {
+				if (Character.isDigit(c)) {					
 					int n = Character.getNumericValue(c);
 					for (int j = 0; j < n; j++) {
-						board.squares[file + 8 * rank] = Piece.Empty;						
+						board.squares[file + 8 * rank] = Piece.Empty;	
+						file++;					
 					}
 				}
-				else {
+				else {									
 					int color = Character.isUpperCase(c) ? Piece.White : Piece.Black;
-					board.squares[file + 8 * rank] = pieces.get(Character.toLowerCase(c)) | color;					
+					board.squares[file + 8 * rank] = pieces.get(Character.toLowerCase(c)) | color;
+					file++;					
 				}
-				file++;
 			}			
 		}
+
+		setKings();
 
 		toMove = fenArray[1].charAt(0);
 		castlingRights = new CastlingRights(fenArray[2]);
@@ -280,18 +309,14 @@ public class Position {
 	}
 
 	public static void main(String[] args) {
-		Position position = new Position();
-		position.loadFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0");
+		Position position = new Position("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 20");
+		
+		position.makeMove(new Move(Board.A5, Board.A6));
+		position.makeMove(new Move(Board.C7, Board.C5));
 
-		List<Move> legalMoves = Utils.generateLegalMoves(position);
+		System.out.println(position.enPassantTarget);
+		position.makeMove(new Move(Board.B5, Board.C6));
 
-		int i = 1;
-		for (Move move : legalMoves) {
-			List<Move> moves = Utils.generateLegalMoves(position);
-			System.out.println(i + ": " + move + " " + moves.size());
-			position.makeMove(move);	
-			position.undoMove();			 
-			i++;
-		}	
+		position.board.printBoard();
 	}
 }

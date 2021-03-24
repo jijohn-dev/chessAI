@@ -23,9 +23,9 @@ public class Move {
 		Start = 8 * startRank + startFile;
 		Target = 8 * targetRank + targetFile;
 
-		// promotion [frfr=p]
-		if (move.length() == 6) {
-			promotionChoice = move.charAt(5);
+		// promotion [frfrp]
+		if (move.length() == 5) {
+			promotionChoice = move.charAt(4);
 		}
 		else {
 			promotionChoice = '-';
@@ -46,6 +46,11 @@ public class Move {
 		str.append(startRank);		
 		str.append(targetFile);
 		str.append(targetRank);
+
+		// promotion choice
+		if (promotionChoice != '-') {
+			str.append(promotionChoice);
+		}
 
 		return str.toString();
 	}

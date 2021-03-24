@@ -31,7 +31,8 @@ test_checkmate = "4K3/8/8/q7/k7/8/8/8 b - - 0 50"
 
 class State:
 	def __init__(self):
-		self.board = chess.Board(test_checkmate)
+		self.board = chess.Board()
+		self.max_depth = 5
 		self.highlighted_square = -1
 		self.piece_selected = False
 		self.promotion_menu_open = False
@@ -98,7 +99,7 @@ def main():
 		# computer move
 		if state.board.turn == chess.BLACK and not state.board.is_game_over():
 			print("computer moving")
-			move = computerMove(state.board, 5, db)			
+			move = computerMove(state.board, state.max_depth, db)			
 			if move == None:
 				print("no move returned")
 			state.board.push(move)	

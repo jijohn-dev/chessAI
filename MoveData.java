@@ -75,4 +75,8 @@ public class MoveData {
 			}
 		}
 	}
+
+	public static void main(String[] args) {
+		System.out.println(KnightOffsets.get(13));
+	}
 }
