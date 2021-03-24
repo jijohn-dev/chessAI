@@ -1,55 +1,42 @@
+import sys
 import chess
 
-board = chess.Board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 1 20")
-
-# 1 ply
-moveTotal = 0
-moveList = ""
-for ply in board.legal_moves:
-	moveTotal += 1
-	moveList += ply.uci() + " "
-
-print(moveTotal, moveList)
-
-# 2 ply
-for ply1 in board.legal_moves:
-	moveTotal = 0
-	moveList = ""
-	board.push(ply1)	
-	for ply2 in board.legal_moves:
-		moveTotal += 1
-		moveList += ply2.uci() + " "	
-	board.pop()	 
-	print(ply1.uci(), moveTotal, moveList)
-
-# 3 ply
-for ply1 in board.legal_moves:	
-	board.push(ply1)	
-	for ply2 in board.legal_moves:
-		moveTotal = 0
+def generate(position, depth, moves, outputFile):
+	if depth == 1:
+		total = 0
 		moveList = ""
-		board.push(ply2)
-		for ply3 in board.legal_moves:
-			moveTotal += 1
-			moveList += ply3.uci() + " "
-		print(ply1.uci(), ply2.uci(), moveTotal, moveList)
-		board.pop()
-	board.pop()	 
+		for ply in position.legal_moves:
+			total += 1
+			moveList += ply.uci() + " "
+		output = moves + str(total) + " " + moveList + "\n"
+		f = open(outputFile, "a+")
+		f.write(output)
+		f.close
+		return
+	else:
+		for ply in position.legal_moves:
+			position.push(ply)
+			generate(position, depth - 1, moves + ply.uci() + " ", outputFile)
+			position.pop()
 
-# 4 ply
-for ply1 in board.legal_moves:	
-	board.push(ply1)	
-	for ply2 in board.legal_moves:		
-		board.push(ply2)
-		for ply3 in board.legal_moves:
-			moveTotal = 0
-			moveList = ""
-			board.push(ply3)
-			for ply4 in board.legal_moves:
-				moveTotal += 1
-				moveList += ply4.uci() + " "
-			print(ply1.uci(), ply2.uci(), ply3.uci(), moveTotal, moveList)
-			board.pop()
-		board.pop()
-	board.pop()	
+def generateAllPlys(position, maxDepth, outputFile):
+	for ply in range(1, maxDepth+1):
+		generate(position, ply, "", outputFile)
 
+# test positions
+f = open("../testData/testPositions.txt", "r")
+positions = f.read().splitlines()
+
+start = int(sys.argv[1])
+
+for index, position in enumerate(positions):
+	if (index >= start - 1):
+		print(position)
+		fileName = "../testData/Pos" + str(index + 1) + ".txt"	
+
+		# clear output file
+		f = open(fileName, "w+")
+		f.truncate(0)
+		f.close()
+
+		generateAllPlys(chess.Board(position), 4, fileName)

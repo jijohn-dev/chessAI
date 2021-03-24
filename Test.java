@@ -94,21 +94,34 @@ public class Test {
 		}
 	}
 
+	private static List<String> readPositions() {
+		Path test_path = Paths.get(System.getProperty("user.dir"), "testData/testPositions.txt");
+		Charset charset = Charset.forName("ISO-8859-1");
+		List<String> positions = new ArrayList<>();
+
+		try {
+			positions = Files.readAllLines(test_path, charset);
+			return positions;		
+
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+
+		return positions;
+	}
+
 	public static void main(String[] args) {
 		int generationDepth = Integer.valueOf(args[0]);
-		int testPosDepth = Integer.valueOf(args[1]);
+		int numTests = Integer.valueOf(args[1]);
 		int engineDepth = Integer.valueOf(args[2]);
 		String minimaxVersions = args[3];
 
 		long startTime;
 		long endTime;
 
-		// move notation constructor
-		Move move = new Move("e2e4");
-		assert move.Start == 12 && move.Target == 28;
-
-		move = new Move("a8a1");
-		assert move.Start == 56 && move.Target == 0;
+		// load test positions
+		List<String> testPositions = readPositions();	
+		System.out.println(testPositions.get(0));	
 
 		// generating legal moves		
 		System.out.println("Move generation depth = " + generationDepth);
@@ -131,22 +144,16 @@ public class Test {
 		System.out.print("Time elapsed: ");
 		System.out.print((endTime - startTime) / 1000000);
 		System.out.println("ms");
-		System.out.println();
-
-		// match legal moves
-		System.out.println("Testing move generation correctness from start");
-		moveGenerationTest(4, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0", "testDataStart.txt");		
+		System.out.println();	
 
 		// test position
-		System.out.println("Test position 5 depth = " + testPosDepth);
+		System.out.println("Test position 5 depth = " + maxDepth);
 		Position test = new Position();
 
-		String pos5 = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
-		test.loadFromFEN(pos5);
+		test.loadFromFEN(testPositions.get(4));
 
-		int[] nodes = { 44, 1486, 62379, 2103487, 89941194};		
+		int[] nodes = { 44, 1486, 62379, 2103487, 89941194};	
 
-		maxDepth = testPosDepth;
 		result = new int[maxDepth];
 
 		startTime = System.nanoTime();
@@ -162,17 +169,13 @@ public class Test {
 		System.out.println("ms");
 		System.out.println();
 
-		// move generation correctness
-		String pos2 = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 1 20";
-		System.out.println("Testing move generation correctness from position 2");
-		moveGenerationTest(4, pos2, "testDataPos2.txt");
-
-		String pos3 = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 20";
-		System.out.println("Testing move generation correctness from position 3");
-		moveGenerationTest(4, pos3, "testDataPos3.txt");
-
-		System.out.println("Testing move generation correctness from position 5");
-		moveGenerationTest(4, pos5, "testDataPos5.txt");		
+		// move generation correctness		
+		for (int i = 0; i < numTests; i++) {
+			System.out.println("Testing move generation correctness from position " + (i+1));
+			String outputFile = "testData/Pos" + (i+1) + ".txt";
+			System.out.println(testPositions.get(i));
+			moveGenerationTest(4, testPositions.get(i), outputFile);			
+		}		
 
 		// Engine evaluation
 		System.out.println("Engine evaluation depth = " + engineDepth);		

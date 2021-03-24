@@ -94,26 +94,29 @@ public class Position {
 
 		// update board
 		int piece = board.squares[move.Start];
+		int name = Piece.name(piece);
 		set(move.Target, piece);
 		set(move.Start, Piece.Empty);
 		
 		// castling
-		if (move.Start == Board.E1 && move.Target == Board.G1) {
-			set(move.Target - 1, Piece.Rook | Piece.White);
-			set(Board.H1, Piece.Empty);
-		}
-		if (move.Start == Board.E1 && move.Target == Board.C1) {
-			set(move.Target + 1, Piece.Rook | Piece.White);
-			set(Board.A1, Piece.Empty);
-		}
-		if (move.Start == Board.E8 && move.Target == Board.G8) {
-			set(move.Target - 1, Piece.Rook | Piece.Black);
-			set(Board.H8, Piece.Empty);
-		}
-		if (move.Start == Board.E8 && move.Target == Board.C8) {
-			set(move.Target + 1, Piece.Rook | Piece.Black);
-			set(Board.A8, Piece.Empty);
-		}	
+		if (name == Piece.King) {
+			if (move.Start == Board.E1 && move.Target == Board.G1) {
+				set(move.Target - 1, Piece.Rook | Piece.White);
+				set(Board.H1, Piece.Empty);
+			}
+			if (move.Start == Board.E1 && move.Target == Board.C1) {
+				set(move.Target + 1, Piece.Rook | Piece.White);
+				set(Board.A1, Piece.Empty);
+			}
+			if (move.Start == Board.E8 && move.Target == Board.G8) {
+				set(move.Target - 1, Piece.Rook | Piece.Black);
+				set(Board.H8, Piece.Empty);
+			}
+			if (move.Start == Board.E8 && move.Target == Board.C8) {
+				set(move.Target + 1, Piece.Rook | Piece.Black);
+				set(Board.A8, Piece.Empty);
+			}	
+		}		
 		
 		// update en passant target if applicable		
 		if (Piece.name(piece) == Piece.Pawn) {

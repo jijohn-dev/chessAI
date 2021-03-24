@@ -179,6 +179,9 @@ public class Utils {
 					else if (steps == 1 && name == Piece.Pawn && (dir == pawnDirStart || dir == pawnDirStart + 1)) {
 						return true;
 					}
+					else if (steps == 1 && name == Piece.King) {
+						return true;
+					}
 					else {
 						break;
 					}
