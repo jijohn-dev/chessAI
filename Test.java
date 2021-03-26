@@ -125,7 +125,7 @@ public class Test {
 
 		// generating legal moves		
 		System.out.println("Move generation depth = " + generationDepth);
-		Game game = new Game();
+		Position pos = new Position();
 		
 		int[] expectedMoves = { 20, 400, 8902, 197281, 4865609, 119060324 };		
 
@@ -134,7 +134,7 @@ public class Test {
 		int[] result = new int[maxDepth];
 
 		startTime = System.nanoTime();
-		ply(game.position, maxDepth, result);
+		ply(pos, maxDepth, result);
 		endTime = System.nanoTime();
 
 		for (int i = 0; i < maxDepth; i++) {
@@ -150,7 +150,7 @@ public class Test {
 		System.out.println("Test position 5 depth = " + maxDepth);
 		Position test = new Position();
 
-		test.loadFromFEN(testPositions.get(4));
+		test.loadFromFEN("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
 
 		int[] nodes = { 44, 1486, 62379, 2103487, 89941194};	
 

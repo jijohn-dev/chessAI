@@ -7,11 +7,13 @@ public class Position {
 	int enPassantTarget;	
 	int halfMoveCount;
 	int moveCount;
+	HashSet<Integer> pieces;
 
 	Stack<Board> stack;	
 	Stack<CastlingRights> castlingStack;
 	Stack<Integer> enPassStack;
 	Stack<Integer> halfMoveStack;
+	Stack<HashSet<Integer>> piecesStack;
 
 	int whiteKing;
 	int blackKing;
@@ -24,42 +26,51 @@ public class Position {
 		halfMoveCount = 0;
 		moveCount = 1;
 
+		pieces = new HashSet<>();
+
 		stack = new Stack<>();
 		castlingStack = new Stack<>();
 		enPassStack = new Stack<>();
-		halfMoveStack = new Stack<>();		
+		halfMoveStack = new Stack<>();
+		piecesStack = new Stack<>();
 
 		whiteKing = 4;
 		blackKing = 60;
 
 		loadFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0");
+		setPieces();
 	}
 
 	public Position(String fen) {
-		board = new Board();
-		enPassantTarget = -1;
-		toMove = 'w';
-		castlingRights = new CastlingRights("KQkq");
-		halfMoveCount = 0;
-		moveCount = 1;
-
-		stack = new Stack<>();
-		castlingStack = new Stack<>();
-		enPassStack = new Stack<>();
-		halfMoveStack = new Stack<>();		
-
-		whiteKing = 4;
-		blackKing = 60;
-
+		this();
 		loadFromFEN(fen);
+		pieces.clear();
+		for (int i = 0; i < 64; i++) {
+			if (at(i) != Piece.Empty) {
+				pieces.add(i);
+			}
+		}
 	}
 
 	public void set(int square, int val) {
 		board.squares[square] = val;
+		if (val == Piece.Empty) {
+			pieces.remove(square);
+		}
+		else {
+			pieces.add(square);
+		}
 	}
 
 	public int at(int square) {
 		return board.squares[square];
+	}
+
+	public void setPieces() {
+		for (int i = 0; i < 16; i++) {
+			pieces.add(i);
+			pieces.add(i + 48);
+		}		
 	}
 
 	public boolean equals(Position that) {
@@ -80,6 +91,13 @@ public class Position {
 		stack.push(board);
 		board = new Board(board);		
 
+		piecesStack.push(pieces);
+		// HashSet<Integer> newPieces = new HashSet<>();
+		// for (int piece : pieces) {
+		// 	newPieces.add(piece);
+		// }
+		// pieces = newPieces;
+
 		castlingStack.push(castlingRights);
 		castlingRights = new CastlingRights(castlingRights);
 
@@ -96,7 +114,7 @@ public class Position {
 		int piece = board.squares[move.Start];
 		int name = Piece.name(piece);
 		set(move.Target, piece);
-		set(move.Start, Piece.Empty);
+		set(move.Start, Piece.Empty);		
 		
 		// castling
 		if (name == Piece.King) {
@@ -123,7 +141,7 @@ public class Position {
 			// en passant
 			int step = toMove == 'w' ? MoveData.Down : MoveData.Up;			
 			if (move.Target == enPassantTarget) {		
-				set(enPassantTarget + step, Piece.Empty);				
+				set(enPassantTarget + step, Piece.Empty);							
 			}	
 			else if (Math.abs(move.Target - move.Start) == 2 * MoveData.Up) {
 				enPassantTarget = move.Start - step;
@@ -174,6 +192,7 @@ public class Position {
 
 	public void undoMove() {
 		board = stack.pop();
+		pieces = piecesStack.pop();
 		toMove = toMove == 'w' ? 'b' : 'w';
 		castlingRights = castlingStack.pop();
 		enPassantTarget = enPassStack.pop();
@@ -317,15 +336,20 @@ public class Position {
 		return str.toString();
 	}
 
+	public void printBoard() {
+		board.printBoard();
+	}
+
+	// public void printPieces() {
+	// 	for (int piece : pieces) {
+	// 		System.out.print(piece + " ");
+	// 	}
+	// 	System.out.println();
+	// }
+
 	public static void main(String[] args) {
-		Position position = new Position("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 20");
+		Position position = new Position("k6K/8/8/8/8/8/3R1N2/8 w - - 0 20");
 		
-		position.makeMove(new Move(Board.A5, Board.A6));
-		position.makeMove(new Move(Board.C7, Board.C5));
-
-		System.out.println(position.enPassantTarget);
-		position.makeMove(new Move(Board.B5, Board.C6));
-
-		position.board.printBoard();
+		
 	}
 }

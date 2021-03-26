@@ -5,6 +5,109 @@ public class Utils {
 	static List<Move> generateLegalMoves(Position pos) {
 		List<Move> moves = new ArrayList<>();
 
+		// for (int square : pos.pieces) {
+		// 	if (pos.pieces.size() > 32) {
+		// 		System.out.println("problem" + pos.pieces.size());
+		// 	}
+		// 	if (pos.at(square) != 0 && Piece.isColor(pos.at(square), pos.toMove)) {
+		// 		int piece = pos.at(square);
+		// 		int name = Piece.name(piece);
+		// 		if (name == Piece.Pawn) {
+		// 			int step = pos.toMove == 'w' ? MoveData.Up : MoveData.Down;
+		// 			if (square + step >= 0 && square + step < 64) {
+		// 				// 1 square
+		// 				if (pos.board.squares[square + step] == 0) {
+		// 					if ((pos.toMove == 'w' && square >= 48) || (pos.toMove == 'b' && square <= 15)) {
+		// 						moves.add(new Move(square, square + step, 'q'));
+		// 						moves.add(new Move(square, square + step, 'b'));
+		// 						moves.add(new Move(square, square + step, 'n'));
+		// 						moves.add(new Move(square, square + step, 'r'));
+		// 					}
+		// 					else {
+		// 						moves.add(new Move(square, square + step));
+		// 					}							
+		// 				}
+		// 				// 2 squares
+		// 				if ((square < 16 && pos.toMove == 'w') || square > 47 && pos.toMove == 'b') {
+		// 					if (pos.board.squares[square + 2*step] == 0 && pos.board.squares[square + step] == 0) {
+		// 						moves.add(new Move(square, square + 2*step));
+		// 					}
+		// 				}	
+		// 				// capture
+		// 				// right
+		// 				if (MoveData.DistanceToEdge[square][3] > 0) {
+		// 					int target = square + step + 1;							
+		// 					if (Piece.isColor(pos.board.squares[target], Opposite(pos.toMove))) {								
+		// 						if ((pos.toMove == 'w' && square >= 48) || (pos.toMove == 'b' && square <= 15)) {
+		// 							moves.add(new Move(square, target, 'q'));
+		// 							moves.add(new Move(square, target, 'b'));
+		// 							moves.add(new Move(square, target, 'n'));
+		// 							moves.add(new Move(square, target, 'r'));
+		// 						}
+		// 						else {
+		// 							moves.add(new Move(square, target));
+		// 						}			
+		// 					} 
+		// 					else if (target == pos.enPassantTarget) {
+		// 						if ((pos.toMove == 'w' && target > 32) || (pos.toMove == 'b' && target < 24)) {
+		// 							moves.add(new Move(square, target));
+		// 						}
+		// 					}
+		// 				}
+		// 				// left
+		// 				if (MoveData.DistanceToEdge[square][2] > 0) {
+		// 					int target = square + step - 1;
+		// 					if (Piece.isColor(pos.board.squares[target], Opposite(pos.toMove))) {
+		// 						if ((pos.toMove == 'w' && square >= 48) || (pos.toMove == 'b' && square <= 15)) {
+		// 							moves.add(new Move(square, target, 'q'));
+		// 							moves.add(new Move(square, target, 'b'));
+		// 							moves.add(new Move(square, target, 'n'));
+		// 							moves.add(new Move(square, target, 'r'));
+		// 						}
+		// 						else {
+		// 							moves.add(new Move(square, target));
+		// 						}			
+		// 					}
+		// 					else if (target == pos.enPassantTarget) {
+		// 						if ((pos.toMove == 'w' && target > 32) || (pos.toMove == 'b' && target < 24)) {
+		// 							moves.add(new Move(square, target));
+		// 						}
+		// 					}
+		// 				}	
+		// 			}								
+		// 		}
+		// 		else if (name == Piece.Knight) {										
+		// 			for (int offset : MoveData.KnightOffsets.get(square)) {												
+		// 				if (!Piece.isColor(pos.board.squares[square + offset], pos.toMove)) {							
+		// 					Move move = new Move(square, square + offset);
+		// 					moves.add(move);							
+		// 				}	
+		// 			}					
+		// 		}
+		// 		else {
+		// 			int dirStart = name == Piece.Bishop ? 4 : 0;
+		// 			int dirEnd = name == Piece.Rook ? 4 : 8;
+		// 			for (int dir = dirStart; dir < dirEnd; dir++) {
+		// 				int maxDist =  MoveData.DistanceToEdge[square][dir];
+		// 				int dist = name == Piece.King ? Math.min(1, maxDist) : maxDist;
+
+		// 				for (int steps = 1; steps <= dist; steps++) {
+		// 					int squareIdx = square + steps * MoveData.Offsets[dir];											
+		// 					if (!Piece.isColor(pos.board.squares[squareIdx], pos.toMove)) {
+		// 						moves.add(new Move(square, squareIdx));
+		// 						if (Piece.isColor(pos.board.squares[squareIdx], Opposite(pos.toMove))) {
+		// 							break;
+		// 						}
+		// 					}
+		// 					else {
+		// 						break;
+		// 					}
+		// 				}						
+		// 			}
+		// 		}
+		// 	}
+		// }
+
 		for (int i = 0; i < 64; i++) {
 			if (pos.board.squares[i] != 0 && Piece.isColor(pos.board.squares[i], pos.toMove)) {
 				int piece = pos.board.squares[i];
@@ -220,35 +323,24 @@ public class Utils {
 		return false;
 	}	
 
-	static int squareToInt(String square) {
+	public static int squareToInt(String square) {
 		int file = square.charAt(0) - 97;
 		int rank = square.charAt(1) - 49;
 		return 8 * rank + file;
 	}
 
-	static char Opposite(char color) {
+	public static char Opposite(char color) {
 		return color == 'w' ? 'b' : 'w';
 	}
 
+	public static boolean gameIsOver(Position position) {
+		List<Move> legalMoves = Utils.generateLegalMoves(position);		
+		return legalMoves.size() == 0;
+	}
+
 	public static void main(String[] args) {
-		Position pos = new Position("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");	
+		Position pos = new Position();	
 
-		// castling
-		pos = new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 1 20");
-
-		System.out.println(pos.castlingRights.fen()); // KQkq
-		pos.makeMove(new Move("e5f7"));
-		System.out.println(pos.castlingRights.fen()); // KQkq
-		pos.makeMove(new Move("h8g8"));
-		System.out.println(pos.castlingRights.fen()); // KQq
-		pos.makeMove(new Move("f7h8"));			
-		System.out.println(pos.castlingRights.fen()); // KQ
-
-		List<Move> legalMoves = generateLegalMoves(pos);
-		for (Move move : legalMoves) {
-			if (move.toString().equals("e8c8")) {
-				System.out.println("queenside");
-			}
-		}
+		
 	}
 }

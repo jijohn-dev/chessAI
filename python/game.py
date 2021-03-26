@@ -32,7 +32,7 @@ test_checkmate = "4K3/8/8/q7/k7/8/8/8 b - - 0 50"
 class State:
 	def __init__(self):
 		self.board = chess.Board()
-		self.max_depth = 5
+		self.max_depth = 3
 		self.highlighted_square = -1
 		self.piece_selected = False
 		self.promotion_menu_open = False

@@ -1,4 +1,4 @@
-from .engine import minimax, minimaxAB, count_pieces
+from .engine import Engine
 import math
 import chess
 import random
@@ -15,6 +15,7 @@ def computerMove(board, maxDepth, db):
 			return chess.Move.from_uci(db[position][rand])	
 
 	# calculate best move
-	eval, bestMove = minimaxAB(board, maxDepth, -math.inf, math.inf, board.turn == chess.WHITE, 0)
+	engine = Engine()
+	eval, bestMove = engine.minimaxABO(board, maxDepth, -math.inf, math.inf, board.turn == chess.WHITE, 0)
 	print(eval)
 	return bestMove

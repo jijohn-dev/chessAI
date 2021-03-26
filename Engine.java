@@ -3,6 +3,8 @@ import java.util.*;
 public class Engine {
 	public int maxDepth;
 
+	public static int[] pieceValues = {0, 1, 3, 3, 5, 9, 0};
+
 	public Engine(int depth) {
 		this.maxDepth = depth;
 	}
@@ -92,6 +94,15 @@ public class Engine {
 	}
 
 	private double staticEval(Position position) {
-		return 0.0;
+		double balance = 0.0;
+		for (int i = 0; i < 64; i++) {
+			if (Piece.isColor(position.at(i), 'w')) {
+				balance += pieceValues[Piece.name(position.at(i))];
+			}
+			else if (Piece.isColor(position.at(i), 'b')) {
+				balance -= pieceValues[Piece.name(position.at(i))];
+			}
+		}
+		return balance;
 	}
 }

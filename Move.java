@@ -15,6 +15,12 @@ public class Move {
 		this.promotionChoice = promotionChoice;
 	}
 
+	public Move() {
+		Start = -1;
+		Target = -1;
+		promotionChoice = '-';
+	}
+
 	public Move(String move) {
 		int startFile = move.charAt(0) - 97;
 		int startRank = move.charAt(1) - 49;
