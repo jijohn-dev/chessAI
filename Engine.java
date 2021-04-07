@@ -17,7 +17,7 @@ public class Engine {
 			return minimaxAB(position, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');
 		}
 		if (mode == 2) {
-
+			return minimaxABO(position, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');
 		}
 		return 0;
 	}
@@ -51,6 +51,7 @@ public class Engine {
 		}
 	}
 
+	// minimax with alpha-beta pruning
 	private double minimaxAB(Position position, int depth, double alpha, double beta, boolean white) {
 		if (depth == 0 || gameIsOver(position)) {
 			return staticEval(position);
@@ -85,6 +86,106 @@ public class Engine {
 				}
 			}
 			return minEval;
+		}
+	}
+
+	// minimax with alpha-beta pruning and move ordering
+	private double minimaxABO(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {
+		if (depth == 0 || gameIsOver(position)) {
+			return staticEval(position);
+		}
+
+		if (whiteToPlay) {
+			double maxEval = Double.NEGATIVE_INFINITY;
+			List<Move> legalMoves = Utils.generateLegalMoves(position);
+
+			// order moves
+			for (Move move : legalMoves) {
+				move.score = scoreMove(position, move);
+			}
+
+			Collections.sort(legalMoves, new MoveComparator());
+
+			for (Move move : legalMoves) {
+				position.makeMove(move);
+				double eval = minimaxABO(position, depth - 1, alpha, beta, false);
+				position.undoMove();
+				maxEval = Math.max(eval, maxEval);
+				alpha = Math.max(alpha, maxEval);
+				if (beta <= alpha) {
+					break;
+				}
+			}
+			return maxEval;
+		}
+		else {
+			double minEval = Double.POSITIVE_INFINITY;
+			List<Move> legalMoves = Utils.generateLegalMoves(position);
+
+			// order moves
+			for (Move move : legalMoves) {
+				move.score = scoreMove(position, move);
+			}
+
+			Collections.sort(legalMoves, new MoveComparator());
+
+			for (Move move : legalMoves) {
+				position.makeMove(move);
+				double eval = minimaxABO(position, depth - 1, alpha, beta, true);
+				position.undoMove();
+				minEval = Math.min(eval, minEval);
+				beta = Math.min(beta, minEval);
+				if (beta <= alpha) {
+					break;
+				}
+			}
+			return minEval;
+		}
+	}
+
+	private int scoreMove(Position pos, Move move) {
+		int score = 0;
+
+		// capturing a piece with a piece of lower value
+		if (pos.at(move.Target) != Piece.Empty) {
+			int enemyValue = pieceValues[Piece.name(pos.at(move.Target))];
+			int value = pieceValues[Piece.name(pos.at(move.Start))];
+			score += enemyValue - value;
+		}
+
+		// promoting a pawn
+		if (move.promotionChoice != '-') {
+			if (move.promotionChoice == 'q') {
+				score += 9;
+			}
+			else if (move.promotionChoice == 'r') {
+				score += 5;
+			}
+			else {
+				score += 3;
+			}
+		}
+
+		// moving a piece to where it can be captured by an enemy pawn
+		int step = Piece.isColor(Piece.name(pos.at(move.Start)), 'w') ? MoveData.Up : MoveData.Down;
+		int enemyColor = step == MoveData.Up ? Piece.Black : Piece.White;
+		if (MoveData.DistanceToEdge[move.Target][4] != 0) {
+			if (pos.at(move.Target + MoveData.Left + step) == (Piece.Pawn | enemyColor)) {
+				score -= pieceValues[Piece.name(pos.at(move.Start))];
+			}
+		}
+		if (MoveData.DistanceToEdge[move.Target][5] != 0) {
+			if (pos.at(move.Target + MoveData.Right + step) == (Piece.Pawn | enemyColor)) {
+				score -= pieceValues[Piece.name(pos.at(move.Start))];
+			}
+		}
+
+		return score;
+	}
+
+	private class MoveComparator implements Comparator<Move> {
+		public int compare(Move a, Move b) {
+			return b.score - a.score;
 		}
 	}
 

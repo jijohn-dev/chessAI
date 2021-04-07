@@ -147,7 +147,7 @@ public class Position {
 				enPassantTarget = move.Start - step;
 			}
 			else if (move.promotionChoice != '-') {
-				set(move.Target, promotionInt(move.promotionChoice, toMove));				
+				set(move.Target, Utils.promotionInt(move.promotionChoice, toMove));				
 			}
 
 			// reset en pass
@@ -210,15 +210,6 @@ public class Position {
 				blackKing = i;
 			} 
 		}
-	}
-
-	public static int promotionInt(char c, char pieceColor) {
-		int color = pieceColor == 'w' ? Piece.White : Piece.Black; 
-		if (c == 'q') return Piece.Queen | color;
-		if (c == 'b') return Piece.Bishop | color;
-		if (c == 'n') return Piece.Knight | color;
-		if (c == 'r') return Piece.Rook | color;
-		else return 0;
 	} 
 
 	public void loadFromFEN(String fen) {
@@ -347,9 +338,7 @@ public class Position {
 	// 	System.out.println();
 	// }
 
-	public static void main(String[] args) {
-		Position position = new Position("k6K/8/8/8/8/8/3R1N2/8 w - - 0 20");
-		
+	public static void main(String[] args) {		
 		
 	}
 }

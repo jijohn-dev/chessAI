@@ -2,23 +2,27 @@ public class Move {
 	public final int Start;
 	public final int Target;
 	public final char promotionChoice;
+	public int score;
 
 	public Move(int start, int target) {
 		this.Start = start;
 		this.Target = target;
 		promotionChoice = '-';
+		score = 0;
 	}
 
 	public Move(int start, int target, char promotionChoice) {
 		this.Start = start;
 		this.Target = target;
 		this.promotionChoice = promotionChoice;
+		score = 0;
 	}
 
 	public Move() {
 		Start = -1;
 		Target = -1;
 		promotionChoice = '-';
+		score = 0;
 	}
 
 	public Move(String move) {

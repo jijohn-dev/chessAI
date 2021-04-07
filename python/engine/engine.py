@@ -226,7 +226,7 @@ def staticEval(position, ply):
 
 	return total
 
-# return list of moves sorted by prospective evaluation
+# determine prospective strength of move
 def score_move(board, move):	
 	score = 0
 	piece_type = board.piece_type_at(move.from_square)

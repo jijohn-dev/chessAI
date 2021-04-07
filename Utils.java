@@ -338,8 +338,16 @@ public class Utils {
 		return legalMoves.size() == 0;
 	}
 
-	public static void main(String[] args) {
-		Position pos = new Position();	
+	public static int promotionInt(char c, char pieceColor) {
+		int color = pieceColor == 'w' ? Piece.White : Piece.Black; 
+		if (c == 'q') return Piece.Queen | color;
+		if (c == 'b') return Piece.Bishop | color;
+		if (c == 'n') return Piece.Knight | color;
+		if (c == 'r') return Piece.Rook | color;
+		else return 0;
+	}
+
+	public static void main(String[] args) {	
 
 		
 	}
