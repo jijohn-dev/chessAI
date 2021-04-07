@@ -6,9 +6,11 @@ class Engine:
 	values = [0, 100, 300, 300, 500, 900, 0]
 	
 	def __init__(self):
-		self.num_positions = 0	
+		self.num_positions = 0
+		self.transpositions = 0
+		self.zobrist_hash = {}
 
-	def reset_num_positions(self):
+	def reset(self):
 		self.num_positions = 0
 
 	def minimax(self, position, depth, white_to_move, ply):
@@ -99,7 +101,7 @@ class Engine:
 			for move in moves:
 				self.num_positions += 1				
 				position.push(move)
-				childEval, best = self.minimaxAB(position, depth - 1, alpha, beta, False, ply + 1)
+				childEval, best = self.minimaxABO(position, depth - 1, alpha, beta, False, ply + 1)
 				position.pop()
 				if childEval > maxEval or childEval == -math.inf:
 					maxEval = childEval
@@ -113,7 +115,58 @@ class Engine:
 			for move in moves:	
 				self.num_positions += 1			
 				position.push(move)
-				childEval, best = self.minimaxAB(position, depth - 1, alpha, beta, True, ply + 1)
+				childEval, best = self.minimaxABO(position, depth - 1, alpha, beta, True, ply + 1)
+				position.pop()
+				if childEval < minEval or childEval == math.inf:
+					minEval = childEval
+					bestMove = move			
+				beta = min(beta, minEval)
+				if beta <= alpha:
+					break			
+			return minEval, bestMove	
+
+	# minimax with alpha beta pruning, move ordering and zobrist hashing
+	def zobrist_ABO(self, position, depth, alpha, beta, white_to_move, ply):
+		if depth == 0 or position.is_game_over():
+			# check hash table for eval
+			transposition = position.fen()[0:-3]
+			if transposition in self.zobrist_hash:
+				self.transpositions += 1
+				return self.zobrist_hash[transposition], None
+			static = staticEval(position, ply)
+			self.zobrist_hash[transposition] = static			
+			return static, None			
+
+		bestMove = None
+
+		# create list of legal moves sorted by prospective evaluation
+		moves = []
+		for move in position.legal_moves:
+			move.score = score_move(position, move)
+			moves.append(move)
+
+		moves.sort(key=lambda move : move.score, reverse=True)
+
+		if white_to_move:
+			maxEval = -math.inf		
+			for move in moves:
+				self.num_positions += 1				
+				position.push(move)
+				childEval, best = self.zobrist_ABO(position, depth - 1, alpha, beta, False, ply + 1)
+				position.pop()
+				if childEval > maxEval or childEval == -math.inf:
+					maxEval = childEval
+					bestMove = move
+				alpha = max(alpha, maxEval)
+				if beta <= alpha:
+					break			
+			return maxEval, bestMove
+		else:
+			minEval = math.inf		
+			for move in moves:	
+				self.num_positions += 1			
+				position.push(move)
+				childEval, best = self.zobrist_ABO(position, depth - 1, alpha, beta, True, ply + 1)
 				position.pop()
 				if childEval < minEval or childEval == math.inf:
 					minEval = childEval
@@ -122,6 +175,7 @@ class Engine:
 				if beta <= alpha:
 					break			
 			return minEval, bestMove
+
 
 def staticEval(position, ply):
 	total = 0
@@ -205,7 +259,6 @@ def distance(a, b):
 	rb = math.floor(b / 8)
 	fb = b % 8
 	return min(abs(ra - rb), abs(fa - fb))
-
 
 def count_pieces(position, color):	
 	total = len(position.pieces(chess.PAWN, color))

@@ -172,7 +172,7 @@ public class Test {
 		// move generation correctness		
 		for (int i = 0; i < numTests; i++) {
 			System.out.println("Testing move generation correctness from position " + (i+1));
-			String outputFile = "testData/Pos" + (i+1) + ".txt";
+			String outputFile = "testData/pos" + (i+1) + ".txt";
 			System.out.println(testPositions.get(i));
 			moveGenerationTest(4, testPositions.get(i), outputFile);			
 		}		

@@ -2,49 +2,50 @@ from engine.engine import Engine
 import chess
 import time
 import math
+import sys
 
-maxDepth = 2
+maxDepth = 5
 
-print("Evaluating starting position depth =", maxDepth)
-board = chess.Board()
+if len(sys.argv) > 1:
+	maxDepth = int(sys.argv[1])
 
 engine = Engine()
 
-startTime = time.time()
-engine.minimax(board, maxDepth, True, 0)
-endTime = time.time()
-
-print("minimax:", math.floor((endTime - startTime) * 1000), "ms")
-
-startTime = time.time()
-engine.minimaxAB(board, maxDepth, -math.inf, math.inf, True, 0)
-endTime = time.time()
-
-print("minimax with pruning:", math.floor((endTime - startTime) * 1000), "ms")
-
 # test position 5
-maxDepth = 4
 print("Evaluating test position 5 depth =", maxDepth)
-board = chess.Board("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8")
+pos5 = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8"
+board = chess.Board(pos5)
 
-if maxDepth < 4:
+# pure minimax
+if maxDepth < 4:	
 	startTime = time.time()
-	engine.reset_num_positions()
+	engine.reset()
 	engine.minimax(board, maxDepth, True, 0)
 	endTime = time.time()
 
 	print("minimax:", math.floor((endTime - startTime) * 1000), "ms", "Positions evaluated:", engine.num_positions)
 
-startTime = time.time()
-engine.reset_num_positions()
-engine.minimaxAB(board, maxDepth, -math.inf, math.inf, True, 0)
-endTime = time.time()
+# minimax with pruning
+if maxDepth < 6:	
+	startTime = time.time()
+	engine.reset()
+	engine.minimaxAB(board, maxDepth, -math.inf, math.inf, True, 0)
+	endTime = time.time()
 
-print("minimax with pruning:", math.floor((endTime - startTime) * 1000), "ms", "Positions evaluated:", engine.num_positions)
+	print("minimax with pruning:", math.floor((endTime - startTime) * 1000), "ms", "Positions evaluated:", engine.num_positions)
 
+# minimax with pruning and move ordering
 startTime = time.time()
-engine.reset_num_positions()
+engine.reset()
 engine.minimaxABO(board, maxDepth, -math.inf, math.inf, True, 0)
 endTime = time.time()
 
 print("minimax with pruning and ordering:", math.floor((endTime - startTime) * 1000), "ms", "Positions evaluated:", engine.num_positions)
+
+# hashing
+startTime = time.time()
+engine.reset()
+engine.zobrist_ABO(board, maxDepth, -math.inf, math.inf, True, 0)
+endTime = time.time()
+
+print("minimax with hashing:", math.floor((endTime - startTime) * 1000), "ms", "Positions evaluated:", engine.num_positions, "transpositions:", engine.transpositions)

@@ -32,7 +32,7 @@ start = int(sys.argv[1])
 for index, position in enumerate(positions):
 	if (index >= start - 1):
 		print(position)
-		fileName = "../testData/Pos" + str(index + 1) + ".txt"	
+		fileName = "../testData/pos" + str(index + 1) + ".txt"	
 
 		# clear output file
 		f = open(fileName, "w+")

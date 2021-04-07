@@ -32,7 +32,7 @@ test_checkmate = "4K3/8/8/q7/k7/8/8/8 b - - 0 50"
 class State:
 	def __init__(self):
 		self.board = chess.Board()
-		self.max_depth = 3
+		self.max_depth = 4
 		self.highlighted_square = -1
 		self.piece_selected = False
 		self.promotion_menu_open = False
@@ -88,6 +88,12 @@ def main():
 
 	# initialize chess game
 	state = State()	
+	print("Choose color [w/b]:")
+	player_color = input()
+	if player_color == "w":
+		state.player_color = chess.WHITE
+	else:
+		state.player_color = chess.BLACK
 
 	# generate openings database
 	db = generate_db()
@@ -97,7 +103,7 @@ def main():
 		redraw_gameWindow(state)	
 
 		# computer move
-		if state.board.turn == chess.BLACK and not state.board.is_game_over():
+		if state.board.turn != state.player_color and not state.board.is_game_over():
 			print("computer moving")
 			move = computerMove(state.board, state.max_depth, db)			
 			if move == None:
@@ -127,7 +133,7 @@ def main():
 						choices = ["q", "b", "n", "r"]
 						choice = choices[math.floor(y / 100)]
 						move = state.promotion_move + choice
-						if state.board.is_legal(chess.Move.from_uci(move)) and state.board.turn == chess.WHITE:			 
+						if state.board.is_legal(chess.Move.from_uci(move)) and state.board.turn == state.player_color:			 
 								state.board.push(chess.Move.from_uci(move))
 								if state.board.is_checkmate():
 									print("checkmate")
@@ -148,7 +154,7 @@ def main():
 								state.promotion_menu_open = True
 								state.promotion_move = move
 							# play move if legal
-							if state.board.is_legal(chess.Move.from_uci(move)) and state.board.turn == chess.WHITE:			 
+							if state.board.is_legal(chess.Move.from_uci(move)) and state.board.turn == state.player_color:			 
 								state.board.push(chess.Move.from_uci(move))
 								if state.board.is_checkmate():
 									print("checkmate")
