@@ -275,7 +275,7 @@ public class Position {
 
 		int emptyCount = 0;
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 7; i >= 0; i--) {
 			for (int j = 0; j < 8; j++) {
 				char c = this.board.charAt(8 * i + j);
 
@@ -296,7 +296,7 @@ public class Position {
 				emptyCount = 0;
 			}
 
-			if (i < 7) {
+			if (i > 0) {
 				str.append("/");
 			}
 		}

@@ -1,29 +1,100 @@
 import java.util.List;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.awt.image.BufferedImage;
+
 public class Game {
-	public static void main(String[] args) {
-		Position game = new Position();
-		game.printBoard();
 
-		Engine engine = new Engine(4);
+	private class BoardPanel extends JPanel {
+		private static final long serialVersionUID = 1;
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					Color color = (i + j) % 2 == 0 ? Color.decode("#eff7d3") : Color.decode("#70a24c");
+					g.setColor(color);
+					g.fillRect(100 * j, 100 * i, 100, 100);
+				}
+			}
 
-		Scanner input = new Scanner(System.in);
+			// draw pieces
+			for (int i = 0; i < 64; i++) {
+				if (board.at(i) != Piece.Empty) {
+					int pieceIdx = (Piece.name(board.at(i)) - 1);
+					if (pieceIdx == 4) {
+						pieceIdx = 5;
+					}
+					else if (pieceIdx == 5) {
+						pieceIdx = 4;
+					}
 
+					int sprX = 100 * pieceIdx;
+					int sprY = Piece.isColor(board.at(i), 'w') ? 0 : 100; 				
+					
+					Image sprite = spritesheet.getSubimage(sprX, sprY, 100, 100);
+					g.drawImage(sprite, 100 * (i % 8), 700 - 100 * (i / 8), this);
+				}			
+			}
+		}
+	}
+
+	private final JFrame gameFrame;
+	private static Dimension OUTER_FRAME_DIMENSION = new Dimension(900, 900);
+
+	private BufferedImage spritesheet;
+
+	private Position board;
+	private Engine engine;
+
+	private Scanner input = new Scanner(System.in);
+
+	public Game() {
+		board = new Position();
+		board.printBoard();
+
+		engine = new Engine(4);		
+		
+		try {
+			spritesheet = ImageIO.read(new File(("img/spritesheet.png")));
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+		
+		
+		// GUI
+		gameFrame = new JFrame("chess");
+		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		BoardPanel boardPanel = new BoardPanel();
+		gameFrame.getContentPane().add(boardPanel);
+
+		gameFrame.pack();
+		gameFrame.setSize(OUTER_FRAME_DIMENSION);
+		gameFrame.setVisible(true);
+	}
+
+	public void play() {
 		// choose color
 		System.out.print("Choose color [white/black]: ");
 		String color = input.next();
 		char player = color.equals("white") ? 'w' : 'b';
 
-		while (!Utils.gameIsOver(game)) {
-			if (game.toMove == player) {
+		// game loop
+		while (!Utils.gameIsOver(board)) {
+			if (board.toMove == player) {
 				System.out.print("Move: ");
 				String cmd = input.next();
 				if (cmd.equals("quit")) {
 					break;
 				}
 				Move move = new Move(cmd);
-				List<Move> legalMoves = Utils.generateLegalMoves(game);
+				List<Move> legalMoves = Utils.generateLegalMoves(board);
 				boolean legal = false;
 				for (Move legalMove : legalMoves) {
 					if (move.toString().equals(legalMove.toString())) {
@@ -31,8 +102,9 @@ public class Game {
 					}
 				}
 				if (legal) {
-					game.makeMove(move);
-					game.printBoard();
+					board.makeMove(move);
+					board.printBoard();					
+					gameFrame.repaint();
 				}
 				else {
 					System.out.println("illegal move ");
@@ -40,24 +112,21 @@ public class Game {
 			}
 			else {
 				System.out.println("Computer moving");
-				List<Move> legalMoves = Utils.generateLegalMoves(game);
-				Move bestMove = new Move();
-				double minEval = Double.POSITIVE_INFINITY;
-				for (Move move : legalMoves) {
-					game.makeMove(move);
-					double eval = engine.eval(game, 1);
-					if (eval < minEval) {
-						minEval = eval;
-						bestMove = move;
-					}
-					game.undoMove();
-				}
-				game.makeMove(bestMove);
+				
+				Move bestMove = engine.computerMove(board);
+
+				board.makeMove(bestMove);
 				System.out.println(bestMove);
-				game.printBoard();
+				board.printBoard();
+				gameFrame.repaint();
 			}
 		}	
 
 		input.close();
+	}
+
+	public static void main(String[] args) {
+		Game game = new Game();
+		game.play();
 	}
 }

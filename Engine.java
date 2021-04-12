@@ -5,6 +5,8 @@ public class Engine {
 
 	public static int[] pieceValues = {0, 1, 3, 3, 5, 9, 0};
 
+	private Move bestMove;
+
 	public Engine(int depth) {
 		this.maxDepth = depth;
 	}
@@ -20,6 +22,16 @@ public class Engine {
 			return minimaxABO(position, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');
 		}
 		return 0;
+	}
+
+	public Move computerMove(Position position) {
+		Position positionCopy = new Position();
+		System.out.println(position.generateFEN());
+		positionCopy.loadFromFEN(position.generateFEN());
+		System.out.println("Position copy:");
+		positionCopy.printBoard();
+		minimaxABO(positionCopy, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');		
+		return bestMove;
 	}
 
 	private double minimax(Position position, int depth, boolean white) {
@@ -111,6 +123,11 @@ public class Engine {
 				double eval = minimaxABO(position, depth - 1, alpha, beta, false);
 				position.undoMove();
 				maxEval = Math.max(eval, maxEval);
+				if (depth == maxDepth) {
+					if (eval == maxEval) {
+						bestMove = move;
+					}
+				}
 				alpha = Math.max(alpha, maxEval);
 				if (beta <= alpha) {
 					break;
@@ -134,6 +151,11 @@ public class Engine {
 				double eval = minimaxABO(position, depth - 1, alpha, beta, true);
 				position.undoMove();
 				minEval = Math.min(eval, minEval);
+				if (depth == maxDepth) {
+					if (eval == minEval) {
+						bestMove = move;
+					}
+				}
 				beta = Math.min(beta, minEval);
 				if (beta <= alpha) {
 					break;
