@@ -54,11 +54,11 @@ public class Game {
 
 	private Scanner input = new Scanner(System.in);
 
-	public Game() {
+	public Game(int depth) {
 		board = new Position();
 		board.printBoard();
 
-		engine = new Engine(4);		
+		engine = new Engine(depth);		
 		
 		try {
 			spritesheet = ImageIO.read(new File(("img/spritesheet.png")));
@@ -120,13 +120,26 @@ public class Game {
 				board.printBoard();
 				gameFrame.repaint();
 			}
+			if (board.checkmate()) {
+				System.out.println("Checkmate");
+			}
+			else if (board.stalemate()) {
+				System.out.println("Stalemate");
+			}
 		}	
 
 		input.close();
 	}
 
 	public static void main(String[] args) {
-		Game game = new Game();
+		int depth = 5;
+		if (args.length > 0) {
+			depth = Integer.valueOf(args[0]);
+		}
+
+		System.out.println("Engine depth: " + depth);
+
+		Game game = new Game(depth);
 		game.play();
 	}
 }

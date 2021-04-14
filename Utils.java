@@ -243,9 +243,10 @@ public class Utils {
 		
 		// filter illegal moves
 		List<Move> legalMoves = new ArrayList<>();
+		char color = pos.toMove;
 		for (Move move : moves) {
 			pos.makeMove(move);
-			if (!kingInCheck(pos)) {
+			if (!kingInCheck(pos, color)) {
 				legalMoves.add(move);
 			}			
 			pos.undoMove();
@@ -254,9 +255,10 @@ public class Utils {
 		return legalMoves;
 	}
 
-	static boolean kingInCheck(Position pos) {
-		int king = pos.toMove == 'w' ? pos.blackKing : pos.whiteKing;			
-		return underAttack(pos, king, pos.toMove);
+	static boolean kingInCheck(Position pos, char color) {
+		int king = color == 'w' ? pos.whiteKing : pos.blackKing;
+		char attackingColor = color == 'w' ? 'b' : 'w';			
+		return underAttack(pos, king, attackingColor);
 	}
 
 	static boolean underAttack(Position pos, int square, char attackingColor) {

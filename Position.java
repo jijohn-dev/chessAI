@@ -87,6 +87,26 @@ public class Position {
 		return true;
 	}
 
+	public boolean checkmate() {
+		List<Move> legalMoves = Utils.generateLegalMoves(this);
+		if (legalMoves.size() == 0) {
+			if (Utils.kingInCheck(this, this.toMove)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean stalemate() {
+		List<Move> legalMoves = Utils.generateLegalMoves(this);
+		if (legalMoves.size() == 0) {
+			if (!Utils.kingInCheck(this, this.toMove)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void makeMove(Move move) {
 		stack.push(board);
 		board = new Board(board);		
@@ -339,6 +359,12 @@ public class Position {
 	// }
 
 	public static void main(String[] args) {		
-		
+		Position mate = new Position("k1Q5/8/RK6/8/8/8/8/8 b - - 0 1");		
+		assert mate.checkmate();
+		assert !mate.stalemate();
+
+		Position stale = new Position("k1K5/2Q5/8/8/8/8/8/8 b - - 0 1");		
+		assert !stale.checkmate();
+		assert stale.stalemate();
 	}
 }

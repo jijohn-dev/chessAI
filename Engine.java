@@ -6,7 +6,7 @@ public class Engine {
 	public static int[] pieceValues = {0, 1, 3, 3, 5, 9, 0};
 
 	private Move bestMove;
-
+	
 	public Engine(int depth) {
 		this.maxDepth = depth;
 	}
@@ -25,11 +25,8 @@ public class Engine {
 	}
 
 	public Move computerMove(Position position) {
-		Position positionCopy = new Position();
-		System.out.println(position.generateFEN());
-		positionCopy.loadFromFEN(position.generateFEN());
-		System.out.println("Position copy:");
-		positionCopy.printBoard();
+		Position positionCopy = new Position();		
+		positionCopy.loadFromFEN(position.generateFEN());		
 		minimaxABO(positionCopy, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');		
 		return bestMove;
 	}
@@ -102,8 +99,17 @@ public class Engine {
 	}
 
 	// minimax with alpha-beta pruning and move ordering
-	private double minimaxABO(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {
-		if (depth == 0 || gameIsOver(position)) {
+	private double minimaxABO(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {		
+		if (gameIsOver(position)) {
+			if (position.checkmate()) {
+				return whiteToPlay ? -100 : 100;
+			}
+			if (position.stalemate()) {
+				return 0.0;
+			}			
+		}
+		if (depth == 0) {
+			// capture search
 			return staticEval(position);
 		}
 
@@ -118,16 +124,18 @@ public class Engine {
 
 			Collections.sort(legalMoves, new MoveComparator());
 
-			for (Move move : legalMoves) {
-				position.makeMove(move);
+			for (Move move : legalMoves) {			
+				position.makeMove(move);							
 				double eval = minimaxABO(position, depth - 1, alpha, beta, false);
-				position.undoMove();
-				maxEval = Math.max(eval, maxEval);
-				if (depth == maxDepth) {
-					if (eval == maxEval) {
+				position.undoMove();	
+
+				if (eval > maxEval) {
+					maxEval = eval;
+					if (depth == maxDepth) {
 						bestMove = move;
 					}
-				}
+				}				
+
 				alpha = Math.max(alpha, maxEval);
 				if (beta <= alpha) {
 					break;
@@ -144,20 +152,22 @@ public class Engine {
 				move.score = scoreMove(position, move);
 			}
 
-			Collections.sort(legalMoves, new MoveComparator());
+			Collections.sort(legalMoves, new MoveComparator());			
 
 			for (Move move : legalMoves) {
 				position.makeMove(move);
 				double eval = minimaxABO(position, depth - 1, alpha, beta, true);
 				position.undoMove();
-				minEval = Math.min(eval, minEval);
-				if (depth == maxDepth) {
-					if (eval == minEval) {
+				
+				if (eval < minEval) {					
+					minEval = eval;
+					if (depth == maxDepth) {
 						bestMove = move;
 					}
-				}
-				beta = Math.min(beta, minEval);
-				if (beta <= alpha) {
+				}				
+
+				beta = Math.min(beta, minEval);				
+				if (beta <= alpha) {					
 					break;
 				}
 			}
@@ -165,11 +175,11 @@ public class Engine {
 		}
 	}
 
-	private int scoreMove(Position pos, Move move) {
+	private static int scoreMove(Position pos, Move move) {
 		int score = 0;
 
 		// capturing a piece with a piece of lower value
-		if (pos.at(move.Target) != Piece.Empty) {
+		if (pos.at(move.Target) != Piece.Empty) {			
 			int enemyValue = pieceValues[Piece.name(pos.at(move.Target))];
 			int value = pieceValues[Piece.name(pos.at(move.Start))];
 			score += enemyValue - value;
@@ -189,19 +199,20 @@ public class Engine {
 		}
 
 		// moving a piece to where it can be captured by an enemy pawn
-		int step = Piece.isColor(Piece.name(pos.at(move.Start)), 'w') ? MoveData.Up : MoveData.Down;
-		int enemyColor = step == MoveData.Up ? Piece.Black : Piece.White;
-		if (MoveData.DistanceToEdge[move.Target][4] != 0) {
-			if (pos.at(move.Target + MoveData.Left + step) == (Piece.Pawn | enemyColor)) {
-				score -= pieceValues[Piece.name(pos.at(move.Start))];
+		if (Piece.name(pos.at(move.Start)) != Piece.Pawn) {			
+			int step = Piece.isColor(Piece.name(pos.at(move.Start)), 'w') ? MoveData.Up : MoveData.Down;
+			int enemyColor = step == MoveData.Up ? Piece.Black : Piece.White;
+			if (MoveData.DistanceToEdge[move.Target][4] != 0) {
+				if (pos.at(move.Target + MoveData.Left + step) == (Piece.Pawn | enemyColor)) {
+					score -= pieceValues[Piece.name(pos.at(move.Start))];
+				}
+			}
+			else if (MoveData.DistanceToEdge[move.Target][5] != 0) {
+				if (pos.at(move.Target + MoveData.Right + step) == (Piece.Pawn | enemyColor)) {
+					score -= pieceValues[Piece.name(pos.at(move.Start))];
+				}
 			}
 		}
-		if (MoveData.DistanceToEdge[move.Target][5] != 0) {
-			if (pos.at(move.Target + MoveData.Right + step) == (Piece.Pawn | enemyColor)) {
-				score -= pieceValues[Piece.name(pos.at(move.Start))];
-			}
-		}
-
 		return score;
 	}
 
@@ -216,16 +227,43 @@ public class Engine {
 		return legalMoves.size() == 0;
 	}
 
-	private double staticEval(Position position) {
+	private static double staticEval(Position position) {
 		double balance = 0.0;
+		
 		for (int i = 0; i < 64; i++) {
 			if (Piece.isColor(position.at(i), 'w')) {
-				balance += pieceValues[Piece.name(position.at(i))];
+				balance += pieceValues[Piece.name(position.at(i))];				
 			}
 			else if (Piece.isColor(position.at(i), 'b')) {
-				balance -= pieceValues[Piece.name(position.at(i))];
+				balance -= pieceValues[Piece.name(position.at(i))];				
 			}
-		}
+		}		
 		return balance;
+	}
+
+	private static void testEvalutation(String fen) {
+		Engine engine = new Engine(3);
+
+		Position pos = new Position(fen);
+		pos.printBoard();
+
+		double evalABO = engine.eval(pos, 2);
+		double balance = Engine.staticEval(pos);
+
+		System.out.println("ABO evaluation: " + evalABO);
+		System.out.println("Best move : " + engine.bestMove);
+		System.out.println("Static evaluation: " + balance);
+	}
+
+	public static void main(String[] args) {
+		Position pos = new Position();		
+
+		pos = new Position("r1bqkb1r/pppppppp/n7/4P3/2B5/5Q2/PPPP1PP/RNB1KBNR b KQkq - 0 1");
+		testEvalutation(pos.generateFEN());
+
+		pos.makeMove(new Move("h8g8"));
+		pos.makeMove(new Move("f3f7"));
+
+		System.out.println(Utils.generateLegalMoves(pos).size());
 	}
 }
