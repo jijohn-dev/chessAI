@@ -45,14 +45,14 @@ public class Game {
 	}
 
 	private final JFrame gameFrame;
-	private static Dimension OUTER_FRAME_DIMENSION = new Dimension(900, 900);
+	private static final Dimension OUTER_FRAME_DIMENSION = new Dimension(900, 900);
 
 	private BufferedImage spritesheet;
 
-	private Position board;
-	private Engine engine;
+	private final Position board;
+	private final Engine engine;
 
-	private Scanner input = new Scanner(System.in);
+	private final Scanner input = new Scanner(System.in);
 
 	public Game(int depth) {
 		board = new Position();
@@ -61,11 +61,11 @@ public class Game {
 		engine = new Engine(depth);		
 		
 		try {
-			spritesheet = ImageIO.read(new File(("img/spritesheet.png")));
+			System.out.println("Working Directory = " + System.getProperty("user.dir"));
+			spritesheet = ImageIO.read(new File(("../img/spritesheet.png")));
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
-		
 		
 		// GUI
 		gameFrame = new JFrame("chess");
@@ -93,6 +93,12 @@ public class Game {
 				if (cmd.equals("quit")) {
 					break;
 				}
+
+				if (cmd.length() < 4 || cmd.length() > 5) {
+					System.out.println("Invalid move");
+					continue;
+				}
+
 				Move move = new Move(cmd);
 				List<Move> legalMoves = Utils.generateLegalMoves(board);
 				boolean legal = false;
@@ -134,7 +140,7 @@ public class Game {
 	public static void main(String[] args) {
 		int depth = 5;
 		if (args.length > 0) {
-			depth = Integer.valueOf(args[0]);
+			depth = Integer.parseInt(args[0]);
 		}
 
 		System.out.println("Engine depth: " + depth);
