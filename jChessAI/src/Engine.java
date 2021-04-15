@@ -122,7 +122,7 @@ public class Engine {
 				move.score = scoreMove(position, move);
 			}
 
-			Collections.sort(legalMoves, new MoveComparator());
+			legalMoves.sort(new MoveComparator());
 
 			for (Move move : legalMoves) {			
 				position.makeMove(move);							
@@ -152,7 +152,7 @@ public class Engine {
 				move.score = scoreMove(position, move);
 			}
 
-			Collections.sort(legalMoves, new MoveComparator());			
+			legalMoves.sort(new MoveComparator());
 
 			for (Move move : legalMoves) {
 				position.makeMove(move);
@@ -216,7 +216,7 @@ public class Engine {
 		return score;
 	}
 
-	private class MoveComparator implements Comparator<Move> {
+	private static class MoveComparator implements Comparator<Move> {
 		public int compare(Move a, Move b) {
 			return b.score - a.score;
 		}
@@ -256,9 +256,8 @@ public class Engine {
 	}
 
 	public static void main(String[] args) {
-		Position pos = new Position();		
-
-		pos = new Position("r1bqkb1r/pppppppp/n7/4P3/2B5/5Q2/PPPP1PP/RNB1KBNR b KQkq - 0 1");
+		Position pos = new Position("r1bqkb1r/pppppppp/n7/4P3/2B5/5Q2/PPPP1PP/RNB1KBNR b KQkq - 0 1");
+		
 		testEvalutation(pos.generateFEN());
 
 		pos.makeMove(new Move("h8g8"));

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -85,6 +86,9 @@ public class Game {
 		String color = input.next();
 		char player = color.equals("white") ? 'w' : 'b';
 
+		Openings book = new Openings();
+		List<String> moves = new ArrayList<>();
+
 		// game loop
 		while (!Utils.gameIsOver(board)) {
 			if (board.toMove == player) {
@@ -109,6 +113,7 @@ public class Game {
 				}
 				if (legal) {
 					board.makeMove(move);
+					moves.add(move.toString());
 					board.printBoard();					
 					gameFrame.repaint();
 				}
@@ -118,11 +123,18 @@ public class Game {
 			}
 			else {
 				System.out.println("Computer moving");
-				
-				Move bestMove = engine.computerMove(board);
 
-				board.makeMove(bestMove);
-				System.out.println(bestMove);
+				Move move;
+				if (board.moveCount < 5) {
+					move = new Move(book.getMove(moves));
+				}
+				else {
+					move = engine.computerMove(board);
+				}
+
+				board.makeMove(move);
+				moves.add(move.toString());
+				System.out.println(move);
 				board.printBoard();
 				gameFrame.repaint();
 			}

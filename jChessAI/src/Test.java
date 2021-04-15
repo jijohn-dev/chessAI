@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.nio.file.Files;
 import java.nio.charset.Charset;
@@ -19,7 +20,7 @@ public class Test {
 
 	private static void moveGenerationTest(int maxPly, String fen, String file) {		
 		Path test_path = Paths.get(System.getProperty("user.dir"), file);
-		Charset charset = Charset.forName("ISO-8859-1");
+		Charset charset = StandardCharsets.ISO_8859_1;
 		try {
 			List<String> data = Files.readAllLines(test_path, charset);
 			
@@ -35,14 +36,14 @@ public class Test {
 					String[] lineData = data.get(curLine).split(" ");
 
 					// play moves if any
-					StringBuilder moveList = new StringBuilder("");
+					StringBuilder moveList = new StringBuilder();
 					for (int i = 0; i < ply-1; i++) {
 						moveList.append(lineData[i]);
 						moveList.append(" ");
 						pos.makeMove(new Move(lineData[i]));
 					}
 					
-					int numMoves = Integer.valueOf(lineData[ply - 1]);
+					int numMoves = Integer.parseInt(lineData[ply - 1]);
 					total += numMoves;
 					List<Move> legalMoves = Utils.generateLegalMoves(pos);
 
@@ -90,13 +91,13 @@ public class Test {
 			System.out.println();
 
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 
 	private static List<String> readPositions() {
 		Path test_path = Paths.get(System.getProperty("user.dir"), "testData/testPositions.txt");
-		Charset charset = Charset.forName("ISO-8859-1");
+		Charset charset = StandardCharsets.ISO_8859_1;
 		List<String> positions = new ArrayList<>();
 
 		try {
@@ -104,16 +105,16 @@ public class Test {
 			return positions;		
 
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 
 		return positions;
 	}
 
 	public static void main(String[] args) {
-		int generationDepth = Integer.valueOf(args[0]);
-		int numTests = Integer.valueOf(args[1]);
-		int engineDepth = Integer.valueOf(args[2]);
+		int generationDepth = Integer.parseInt(args[0]);
+		int numTests = Integer.parseInt(args[1]);
+		int engineDepth = Integer.parseInt(args[2]);
 		String minimaxVersions = args[3];
 
 		long startTime;

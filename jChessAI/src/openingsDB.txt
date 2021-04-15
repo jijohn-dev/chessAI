@@ -1,0 +1,22 @@
+italian
+e2e4 e7e5 g1f3 b8c6 f1c4
+ruy lopez
+e2e4 e7e5 g1f3 b8c6 f1b5
+scotch
+e2e4 e7e5 g1f3 b8c6 d2d4
+closed sicilian
+e2e4 c7c5 b1c3 b8c6
+open sicilian
+e2e4 c7c5 g1f3 d7d6
+advance caro-kann
+e2e4 c7c6 d2d4 d7d5 e4e5
+exchange caro-kann
+e2e4 c7c6 d2d4 d7d5 e4d5 c6d5
+queen's gambit declined
+d2d4 d7d5 c2c4 c7c6
+slav defense
+d2d4 d7d5 c2c4 e7e6
+king's indian
+d2d4 g8f6 c2c4 g7g6
+london
+d2d4 d7d5 g1f3 g8f6 c1f4
