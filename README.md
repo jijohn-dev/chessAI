@@ -4,10 +4,11 @@ An ongoing journey down the rabbit hole of chess programming.
 Python implementation uses python-chess to handle all of the chess logic.  
 Includes basic pygame gui for playing against the engine.  
   
-Java implementation includes chess logic. No gui yet.    
+Java implementation includes chess logic.
+Board graphics are displayed when playing but moves must be entered in the command line.   
 Currently able to generate correct number of positions from the starting position at a depth of 6 ply (119,060,324)
 and exactly matches positions reached from test position 5 on the chess programming wiki at a depth of 5 ply (89,941,194 positions).  
-I'm fairly confident in the current level of correctness but I should probably perform some more rigorous testing.  
+I'm fairly confident in the current level of correctness.  
 
 # Future Improvements
 - Iterative deepening  
