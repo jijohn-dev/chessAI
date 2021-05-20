@@ -1,22 +1,16 @@
 # Overview  
-An ongoing journey down the rabbit hole of chess programming.  
+Chess AI project
+
+python-chess used as reference for testing correctness of legal move generation.
   
 Python implementation uses python-chess to handle all of the chess logic.  
 Includes basic pygame gui for playing against the engine.  
-  
-Java implementation includes chess logic.
-Board graphics are displayed when playing but moves must be entered in the command line.   
-Currently able to generate correct number of positions from the starting position at a depth of 6 ply (119,060,324)
-and exactly matches positions reached from test position 5 on the chess programming wiki at a depth of 5 ply (89,941,194 positions).  
-I'm fairly confident in the current level of correctness.  
 
-# Future Improvements
-- Iterative deepening  
-- More detailed static evaluation  
-- Click and drag functionality for gui  
-- Time controls  
-- More efficient Java chess logic
-
+# Java Engine Commands
+play - start a game from the current position against the engine  
+pos - load position from FEN string  
+eval - print engine evaluation of current position  
+test - run move generation and evaluation performance tests
 
 # Test Data
 generateData.py reads FEN positions from /testData/testPositions.txt and generates pos[#].txt for each position containing every subset of moves and the resulting
