@@ -257,7 +257,7 @@ public class Engine {
 
 	public static void main(String[] args) {
 		Position pos = new Position("r1bqkb1r/pppppppp/n7/4P3/2B5/5Q2/PPPP1PP/RNB1KBNR b KQkq - 0 1");
-		
+
 		testEvalutation(pos.generateFEN());
 
 		pos.makeMove(new Move("h8g8"));
