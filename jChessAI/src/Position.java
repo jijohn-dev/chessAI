@@ -90,9 +90,7 @@ public class Position {
 	public boolean checkmate() {
 		List<Move> legalMoves = Utils.generateLegalMoves(this);
 		if (legalMoves.size() == 0) {
-			if (Utils.kingInCheck(this, this.toMove)) {
-				return true;
-			}
+			return Utils.kingInCheck(this, this.toMove);
 		}
 		return false;
 	}
@@ -100,9 +98,7 @@ public class Position {
 	public boolean stalemate() {
 		List<Move> legalMoves = Utils.generateLegalMoves(this);
 		if (legalMoves.size() == 0) {
-			if (!Utils.kingInCheck(this, this.toMove)) {
-				return true;
-			}
+			return !Utils.kingInCheck(this, this.toMove);
 		}
 		return false;
 	}
@@ -321,9 +317,9 @@ public class Position {
 			}
 		}
 
-		str.append(' ' + Character.toString(toMove));
-		str.append(' ' + castlingRights.fen() + ' ' + enPassToString(enPassantTarget));
-		str.append(' ' + String.valueOf(halfMoveCount) + ' ' + String.valueOf(moveCount));
+		str.append(' ').append(Character.toString(toMove));
+		str.append(' ').append(castlingRights.fen()).append(' ').append(enPassToString(enPassantTarget));
+		str.append(' ').append(String.valueOf(halfMoveCount)).append(' ').append(String.valueOf(moveCount));
 		return str.toString();
 	}
 

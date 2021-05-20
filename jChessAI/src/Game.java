@@ -50,7 +50,7 @@ public class Game {
 
 	private BufferedImage spritesheet;
 
-	private final Position board;
+	private Position board;
 	private final Engine engine;
 
 	private final Scanner input = new Scanner(System.in);
@@ -62,7 +62,7 @@ public class Game {
 		engine = new Engine(depth);		
 		
 		try {
-			System.out.println("Working Directory = " + System.getProperty("user.dir"));
+//			System.out.println("Working Directory = " + System.getProperty("user.dir"));
 			spritesheet = ImageIO.read(new File(("../img/spritesheet.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -80,6 +80,12 @@ public class Game {
 		gameFrame.setVisible(true);
 	}
 
+	// start game with custom position
+	public Game(int depth, Position pos) {
+		this(depth);
+		board = pos;
+	}
+
 	public void play() {
 		// choose color
 		System.out.print("Choose color [white/black]: ");
@@ -95,6 +101,7 @@ public class Game {
 				System.out.print("Move: ");
 				String cmd = input.next();
 				if (cmd.equals("quit")) {
+					gameFrame.dispose();
 					break;
 				}
 
@@ -126,7 +133,13 @@ public class Game {
 
 				Move move;
 				if (board.moveCount < 5) {
-					move = new Move(book.getMove(moves));
+					String moveString = book.getMove(moves);
+					if (moveString.equals("")) {
+						move = engine.computerMove(board);
+					}
+					else {
+						move = new Move(book.getMove(moves));
+					}
 				}
 				else {
 					move = engine.computerMove(board);
@@ -146,18 +159,6 @@ public class Game {
 			}
 		}	
 
-		input.close();
-	}
-
-	public static void main(String[] args) {
-		int depth = 5;
-		if (args.length > 0) {
-			depth = Integer.parseInt(args[0]);
-		}
-
-		System.out.println("Engine depth: " + depth);
-
-		Game game = new Game(depth);
-		game.play();
+		//input.close();
 	}
 }

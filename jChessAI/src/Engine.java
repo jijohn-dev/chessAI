@@ -1,6 +1,10 @@
 import java.util.*;
 
 public class Engine {
+	public static final int MINIMAX = 0;
+	public static final int MINIMAX_AB = 1;
+	public static final int MINIMAX_ABO = 2;
+
 	public int maxDepth;
 
 	public static int[] pieceValues = {0, 1, 3, 3, 5, 9, 0};
@@ -12,13 +16,13 @@ public class Engine {
 	}
 
 	public double eval(Position position, int mode) {
-		if (mode == 0) {
+		if (mode == MINIMAX) {
 			return minimax(position, maxDepth, position.toMove == 'w');
 		}
-		if (mode == 1) {
+		if (mode == MINIMAX_AB) {
 			return minimaxAB(position, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');
 		}
-		if (mode == 2) {
+		if (mode == MINIMAX_ABO) {
 			return minimaxABO(position, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');
 		}
 		return 0;

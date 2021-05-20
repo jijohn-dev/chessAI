@@ -33,7 +33,7 @@ public class Move {
 		Start = 8 * startRank + startFile;
 		Target = 8 * targetRank + targetFile;
 
-		// promotion [frfrp]
+		// promotion [<file><rank><file><rank><promotion choice>]
 		if (move.length() == 5) {
 			promotionChoice = move.charAt(4);
 		}

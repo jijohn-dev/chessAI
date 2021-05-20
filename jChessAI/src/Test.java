@@ -96,7 +96,7 @@ public class Test {
 	}
 
 	private static List<String> readPositions() {
-		Path test_path = Paths.get(System.getProperty("user.dir"), "testData/testPositions.txt");
+		Path test_path = Paths.get(System.getProperty("user.dir"), "src/testData/testPositions.txt");
 		Charset charset = StandardCharsets.ISO_8859_1;
 		List<String> positions = new ArrayList<>();
 
@@ -111,12 +111,7 @@ public class Test {
 		return positions;
 	}
 
-	public static void main(String[] args) {
-		int generationDepth = Integer.parseInt(args[0]);
-		int numTests = Integer.parseInt(args[1]);
-		int engineDepth = Integer.parseInt(args[2]);
-		String minimaxVersions = args[3];
-
+	public static void runTests(int generationDepth, int numTests, int engineDepth, String minimaxVersions) {
 		long startTime;
 		long endTime;
 
@@ -173,7 +168,7 @@ public class Test {
 		// move generation correctness		
 		for (int i = 0; i < numTests; i++) {
 			System.out.println("Testing move generation correctness from position " + (i+1));
-			String outputFile = "testData/pos" + (i+1) + ".txt";
+			String outputFile = "src/testData/pos" + (i+1) + ".txt";
 			System.out.println(testPositions.get(i));
 			moveGenerationTest(4, testPositions.get(i), outputFile);			
 		}		
@@ -190,7 +185,7 @@ public class Test {
 			res = engine.eval(test, 0);
 			endTime = System.nanoTime();
 
-			System.out.println("Minimax:                           Evalution: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
+			System.out.println("Minimax:                           Evaluation: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
 		}
 
 		if (minimaxVersions.contains("p")) {
@@ -198,7 +193,7 @@ public class Test {
 			res = engine.eval(test, 1);
 			endTime = System.nanoTime();
 
-			System.out.println("Minimax with pruning:              Evalution: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
+			System.out.println("Minimax with pruning:              Evaluation: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
 		}
 
 		if (minimaxVersions.contains("o")) {
@@ -206,7 +201,7 @@ public class Test {
 			res = engine.eval(test, 2);
 			endTime = System.nanoTime();
 
-			System.out.println("Minimax with pruning and ordering: Evalution: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
+			System.out.println("Minimax with pruning and ordering: Evaluation: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
 		}	
 		
 		// 3 ply move generation test
