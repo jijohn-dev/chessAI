@@ -57,8 +57,6 @@ public class Game {
 
 	public Game(int depth) {
 		board = new Position();
-		board.printBoard();
-
 		engine = new Engine(depth);		
 		
 		try {
@@ -70,7 +68,7 @@ public class Game {
 		
 		// GUI
 		gameFrame = new JFrame("chess");
-		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		BoardPanel boardPanel = new BoardPanel();
 		gameFrame.getContentPane().add(boardPanel);
@@ -87,6 +85,7 @@ public class Game {
 	}
 
 	public void play() {
+		board.printBoard();
 		// choose color
 		System.out.print("Choose color [white/black]: ");
 		String color = input.next();
@@ -151,13 +150,22 @@ public class Game {
 				board.printBoard();
 				gameFrame.repaint();
 			}
-			if (board.checkmate()) {
-				System.out.println("Checkmate");
-			}
-			else if (board.stalemate()) {
-				System.out.println("Stalemate");
-			}
-		}	
+		}
+
+		if (board.checkmate()) {
+			System.out.println("Checkmate");
+		}
+		else if (board.stalemate()) {
+			System.out.println("Stalemate");
+		}
+
+		System.out.print("--Press enter to continue--");
+		try {
+			System.in.read();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		gameFrame.dispose();
 
 		//input.close();
 	}

@@ -1,0 +1,2 @@
+two rooks mate in 2
+4k3/8/8/R7/1R/8/7K/8 w - - 0 1

@@ -1,6 +1,8 @@
 import java.util.*;
 
 public class Position {
+	public static String startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0";
+
 	Board board;	
 	char toMove;
 	CastlingRights castlingRights;
@@ -37,7 +39,7 @@ public class Position {
 		whiteKing = 4;
 		blackKing = 60;
 
-		loadFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 0");
+		loadFromFEN(startFEN);
 		setPieces();
 	}
 
@@ -50,6 +52,10 @@ public class Position {
 				pieces.add(i);
 			}
 		}
+	}
+
+	public void reset() {
+		loadFromFEN(startFEN);
 	}
 
 	public void set(int square, int val) {
@@ -155,11 +161,12 @@ public class Position {
 		// update en passant target if applicable		
 		if (Piece.name(piece) == Piece.Pawn) {
 			// en passant
-			int step = toMove == 'w' ? MoveData.Down : MoveData.Up;			
+			int step = toMove == 'w' ? MoveData.Down : MoveData.Up;
+			int distance = Math.abs(move.Target - move.Start);
 			if (move.Target == enPassantTarget) {		
 				set(enPassantTarget + step, Piece.Empty);							
 			}	
-			else if (Math.abs(move.Target - move.Start) == 2 * MoveData.Up) {
+			else if (distance == 2 * MoveData.Up) {
 				enPassantTarget = move.Start - step;
 			}
 			else if (move.promotionChoice != '-') {
@@ -167,7 +174,7 @@ public class Position {
 			}
 
 			// reset en pass
-			if (Math.abs(move.Target - move.Start) != 2 * MoveData.Up) {
+			if (distance != 2 * MoveData.Up) {
 				enPassantTarget = -1;
 			}
 		}	

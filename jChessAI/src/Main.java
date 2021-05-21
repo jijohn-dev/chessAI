@@ -19,11 +19,11 @@ public class Main {
             switch (cmd) {
                 case "help":
                     System.out.println("Available commands:");
-                    System.out.println("[play] [pos] [eval] [depth] [test] [quit]");
+                    System.out.println("[play] [pos] [reset] [eval] [depth] [test] [quit]");
                     break;
                 // play against engine
                 case "play":
-                    Game game = new Game(5);
+                    Game game = new Game(5, position);
                     game.play();
                     break;
                 // load a position
@@ -31,6 +31,7 @@ public class Main {
                     System.out.print("Enter FEN: ");
                     String fen = input.next();
                     position = new Position(fen);
+                    position.printBoard();
                     break;
                 // evaluate current position
                 case "eval":
@@ -53,6 +54,9 @@ public class Main {
                     Test.runTests(generationDepth, numTestPositions, evalDepth, versions);
                     System.out.println("Tests completed");
                     break;
+                case "reset":
+                    position.reset();
+                    break;
                 // quit
                 case "quit":
                     running = false;
@@ -60,6 +64,7 @@ public class Main {
                 // invalid command
                 default:
                     System.out.println("Command not recognized");
+                    System.out.println("use <help> to show available commands");
             }
         }
     }

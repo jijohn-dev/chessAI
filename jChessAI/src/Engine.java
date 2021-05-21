@@ -65,12 +65,12 @@ public class Engine {
 	}
 
 	// minimax with alpha-beta pruning
-	private double minimaxAB(Position position, int depth, double alpha, double beta, boolean white) {
+	private double minimaxAB(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {
 		if (depth == 0 || gameIsOver(position)) {
 			return staticEval(position);
 		}
 
-		if (white) {
+		if (whiteToPlay) {
 			double maxEval = Double.NEGATIVE_INFINITY;
 			List<Move> legalMoves = Utils.generateLegalMoves(position);
 			for (Move move : legalMoves) {
@@ -203,17 +203,18 @@ public class Engine {
 		}
 
 		// moving a piece to where it can be captured by an enemy pawn
+		int piece = Piece.name(pos.at(move.Start));
 		if (Piece.name(pos.at(move.Start)) != Piece.Pawn) {			
-			int step = Piece.isColor(Piece.name(pos.at(move.Start)), 'w') ? MoveData.Up : MoveData.Down;
+			int step = Piece.isColor(piece, 'w') ? MoveData.Up : MoveData.Down;
 			int enemyColor = step == MoveData.Up ? Piece.Black : Piece.White;
 			if (MoveData.DistanceToEdge[move.Target][4] != 0) {
 				if (pos.at(move.Target + MoveData.Left + step) == (Piece.Pawn | enemyColor)) {
-					score -= pieceValues[Piece.name(pos.at(move.Start))];
+					score -= pieceValues[piece];
 				}
 			}
 			else if (MoveData.DistanceToEdge[move.Target][5] != 0) {
 				if (pos.at(move.Target + MoveData.Right + step) == (Piece.Pawn | enemyColor)) {
-					score -= pieceValues[Piece.name(pos.at(move.Start))];
+					score -= pieceValues[piece];
 				}
 			}
 		}
@@ -245,7 +246,7 @@ public class Engine {
 		return balance;
 	}
 
-	private static void testEvalutation(String fen) {
+	private static void testEvaluation(String fen) {
 		Engine engine = new Engine(3);
 
 		Position pos = new Position(fen);
@@ -262,7 +263,7 @@ public class Engine {
 	public static void main(String[] args) {
 		Position pos = new Position("r1bqkb1r/pppppppp/n7/4P3/2B5/5Q2/PPPP1PP/RNB1KBNR b KQkq - 0 1");
 
-		testEvalutation(pos.generateFEN());
+		testEvaluation(pos.generateFEN());
 
 		pos.makeMove(new Move("h8g8"));
 		pos.makeMove(new Move("f3f7"));
