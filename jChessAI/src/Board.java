@@ -81,9 +81,7 @@ public class Board {
 
 	public Board(Board that) {
 		this.squares = new int[64];
-		for (int i = 0; i < 64; i++) {
-			this.squares[i] = that.squares[i];
-		}
+		System.arraycopy(that.squares, 0, this.squares, 0, 64);
 	}
 
 	public void printBoard() {

@@ -12,8 +12,12 @@ public class Main {
         Engine engine = new Engine(depth);
 
         while (running) {
-            System.out.print(">");
+            System.out.print("> ");
             String cmd = input.next();
+
+            // max depths
+            int maxGenDepth = 6;
+            int maxEvalDepth = 5;
 
             // play vs Engine
             switch (cmd) {
@@ -40,13 +44,13 @@ public class Main {
                 // testing
                 case "test":
                     System.out.print("Generation depth: ");
-                    int generationDepth = Math.min(5, Integer.parseInt(input.next()));
+                    int generationDepth = Math.min(maxGenDepth, Integer.parseInt(input.next()));
 
                     System.out.print("Number of test positions: ");
                     int numTestPositions = Integer.parseInt(input.next());
 
                     System.out.print("Engine evaluation depth: ");
-                    int evalDepth = Math.min(5, Integer.parseInt(input.next()));
+                    int evalDepth = Math.min(maxEvalDepth, Integer.parseInt(input.next()));
 
                     System.out.print("Minimax versions [mpo]: ");
                     String versions = input.next();

@@ -236,6 +236,8 @@ public class Position {
 	} 
 
 	public void loadFromFEN(String fen) {
+		board = new Board();
+
 		Map<Character, Integer> pieces = new HashMap<>();
 
 		pieces.put('p', Piece.Pawn);

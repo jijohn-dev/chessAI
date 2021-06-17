@@ -178,11 +178,11 @@ public class Test {
 		maxDepth = engineDepth;
 		Engine engine = new Engine(maxDepth);
 
-		double res;
+		Engine.Eval res;
 
 		if (minimaxVersions.contains("m")) {
 			startTime = System.nanoTime();
-			res = engine.eval(test, 0);
+			res = engine.eval(test, Engine.MINIMAX);
 			endTime = System.nanoTime();
 
 			System.out.println("Minimax:                           Evaluation: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
@@ -190,7 +190,7 @@ public class Test {
 
 		if (minimaxVersions.contains("p")) {
 			startTime = System.nanoTime();
-			res = engine.eval(test, 1);
+			res = engine.eval(test, Engine.MINIMAX_AB);
 			endTime = System.nanoTime();
 
 			System.out.println("Minimax with pruning:              Evaluation: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");
@@ -198,7 +198,7 @@ public class Test {
 
 		if (minimaxVersions.contains("o")) {
 			startTime = System.nanoTime();
-			res = engine.eval(test, 2);
+			res = engine.eval(test, Engine.MINIMAX_ABO);
 			endTime = System.nanoTime();
 
 			System.out.println("Minimax with pruning and ordering: Evaluation: " + res + " Time: " + (endTime - startTime) / 1000000 + "ms");

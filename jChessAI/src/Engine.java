@@ -5,9 +5,61 @@ public class Engine {
 	public static final int MINIMAX_AB = 1;
 	public static final int MINIMAX_ABO = 2;
 
-	public int maxDepth;
+	public static class Eval {
+		double eval;
+		int mateIn;
+
+		Eval(double eval, int mateIn) {
+			this.eval = eval;
+			this.mateIn = mateIn;
+		}
+
+		boolean higher(Eval that) {
+			if (this.eval > that.eval) {
+				return true;
+			}
+			if (this.eval == Double.POSITIVE_INFINITY && that.eval == Double.POSITIVE_INFINITY) {
+				return this.mateIn < that.mateIn;
+			}
+			if (this.eval == Double.NEGATIVE_INFINITY && that.eval == Double.NEGATIVE_INFINITY) {
+				return this.mateIn > that.mateIn;
+			}
+			return false;
+		}
+
+		boolean lower(Eval that) {
+			if (this.eval < that.eval) {
+				return true;
+			}
+			if (this.eval == Double.NEGATIVE_INFINITY && that.eval == Double.NEGATIVE_INFINITY) {
+				return this.mateIn < that.mateIn;
+			}
+			if (this.eval == Double.POSITIVE_INFINITY && that.eval == Double.POSITIVE_INFINITY) {
+				return this.mateIn > that.mateIn;
+			}
+			return false;
+		}
+
+		public String toString() {
+			if (eval == Double.POSITIVE_INFINITY) {
+				return "mate in " + mateIn + " for white";
+			}
+			if (eval == Double.NEGATIVE_INFINITY) {
+				return "mate in " + mateIn + " for black";
+			}
+			if (eval < 0) {
+				return "-" + eval;
+			}
+			if (eval > 0) {
+				return "+" + eval;
+			}
+			return "0.0";
+		}
+	}
 
 	public static int[] pieceValues = {0, 1, 3, 3, 5, 9, 0};
+
+	public int maxDepth;
 
 	private Move bestMove;
 	
@@ -15,7 +67,7 @@ public class Engine {
 		this.maxDepth = depth;
 	}
 
-	public double eval(Position position, int mode) {
+	public Eval eval(Position position, int mode) {
 		if (mode == MINIMAX) {
 			return minimax(position, maxDepth, position.toMove == 'w');
 		}
@@ -25,7 +77,7 @@ public class Engine {
 		if (mode == MINIMAX_ABO) {
 			return minimaxABO(position, maxDepth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, position.toMove == 'w');
 		}
-		return 0;
+		return new Eval(0.0, -1);
 	}
 
 	public Move computerMove(Position position) {
@@ -35,50 +87,63 @@ public class Engine {
 		return bestMove;
 	}
 
-	private double minimax(Position position, int depth, boolean white) {
+	private Eval minimax(Position position, int depth, boolean white) {
 		if (depth == 0 || gameIsOver(position)) {
 			return staticEval(position);
 		}
 
 		if (white) {
-			double maxEval = Double.NEGATIVE_INFINITY;
+			//double maxEval = Double.NEGATIVE_INFINITY;
+			Eval maxEval = new Eval(Double.NEGATIVE_INFINITY, Integer.MAX_VALUE);
 			List<Move> legalMoves = Utils.generateLegalMoves(position);
 			for (Move move : legalMoves) {
 				position.makeMove(move);
-				double eval = minimax(position, depth - 1, false);
+				Eval eval = minimax(position, depth - 1, false);
 				position.undoMove();
-				maxEval = Math.max(eval, maxEval);				
+
+				if (eval.higher(maxEval)) {
+					maxEval = eval;
+				}
 			}
 			return maxEval;
 		}
 		else {
-			double minEval = Double.POSITIVE_INFINITY;
+			//double minEval = Double.POSITIVE_INFINITY;
+			Eval minEval = new Eval(Double.POSITIVE_INFINITY, Integer.MAX_VALUE);
 			List<Move> legalMoves = Utils.generateLegalMoves(position);
 			for (Move move : legalMoves) {
 				position.makeMove(move);
-				double eval = minimax(position, depth - 1, true);
+				Eval eval = minimax(position, depth - 1, true);
 				position.undoMove();
-				minEval = Math.min(eval, minEval);				
+
+				if (eval.lower(minEval)) {
+					minEval = eval;
+				}
 			}
 			return minEval;
 		}
 	}
 
 	// minimax with alpha-beta pruning
-	private double minimaxAB(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {
+	private Eval minimaxAB(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {
 		if (depth == 0 || gameIsOver(position)) {
 			return staticEval(position);
 		}
 
 		if (whiteToPlay) {
-			double maxEval = Double.NEGATIVE_INFINITY;
+			//double maxEval = Double.NEGATIVE_INFINITY;
+			Eval maxEval = new Eval(Double.NEGATIVE_INFINITY, Integer.MAX_VALUE);
 			List<Move> legalMoves = Utils.generateLegalMoves(position);
 			for (Move move : legalMoves) {
 				position.makeMove(move);
-				double eval = minimaxAB(position, depth - 1, alpha, beta, false);
+				Eval eval = minimaxAB(position, depth - 1, alpha, beta, false);
 				position.undoMove();
-				maxEval = Math.max(eval, maxEval);
-				alpha = Math.max(alpha, maxEval);
+
+				if (eval.higher(maxEval)) {
+					maxEval = eval;
+				}
+
+				alpha = Math.max(alpha, maxEval.eval);
 				if (beta <= alpha) {
 					break;
 				}
@@ -86,14 +151,19 @@ public class Engine {
 			return maxEval;
 		}
 		else {
-			double minEval = Double.POSITIVE_INFINITY;
+			//double minEval = Double.POSITIVE_INFINITY;
+			Eval minEval = new Eval(Double.POSITIVE_INFINITY, Integer.MAX_VALUE);
 			List<Move> legalMoves = Utils.generateLegalMoves(position);
 			for (Move move : legalMoves) {
 				position.makeMove(move);
-				double eval = minimaxAB(position, depth - 1, alpha, beta, true);
+				Eval eval = minimaxAB(position, depth - 1, alpha, beta, true);
 				position.undoMove();
-				minEval = Math.min(eval, minEval);
-				beta = Math.min(beta, minEval);
+
+				if (eval.lower(minEval)) {
+					minEval = eval;
+				}
+
+				beta = Math.min(beta, minEval.eval);
 				if (beta <= alpha) {
 					break;
 				}
@@ -103,22 +173,25 @@ public class Engine {
 	}
 
 	// minimax with alpha-beta pruning and move ordering
-	private double minimaxABO(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {		
+	private Eval minimaxABO(Position position, int depth, double alpha, double beta, boolean whiteToPlay) {
 		if (gameIsOver(position)) {
+			Eval eval = new Eval(0.0, Integer.MAX_VALUE);
 			if (position.checkmate()) {
-				return whiteToPlay ? -100 : 100;
+				eval.eval = whiteToPlay ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+				eval.mateIn = (int) Math.ceil((maxDepth - depth) / 2.0);
+				return eval;
 			}
 			if (position.stalemate()) {
-				return 0.0;
+				return eval;
 			}			
 		}
 		if (depth == 0) {
-			// capture search
+			// TODO capture search
 			return staticEval(position);
 		}
 
 		if (whiteToPlay) {
-			double maxEval = Double.NEGATIVE_INFINITY;
+			Eval maxEval = new Eval(Double.NEGATIVE_INFINITY, 0);
 			List<Move> legalMoves = Utils.generateLegalMoves(position);
 
 			// order moves
@@ -130,17 +203,17 @@ public class Engine {
 
 			for (Move move : legalMoves) {			
 				position.makeMove(move);							
-				double eval = minimaxABO(position, depth - 1, alpha, beta, false);
+				Eval eval = minimaxABO(position, depth - 1, alpha, beta, false);
 				position.undoMove();	
 
-				if (eval > maxEval) {
+				if (eval.higher(maxEval)) {
 					maxEval = eval;
 					if (depth == maxDepth) {
 						bestMove = move;
 					}
 				}				
 
-				alpha = Math.max(alpha, maxEval);
+				alpha = Math.max(alpha, maxEval.eval);
 				if (beta <= alpha) {
 					break;
 				}
@@ -148,7 +221,7 @@ public class Engine {
 			return maxEval;
 		}
 		else {
-			double minEval = Double.POSITIVE_INFINITY;
+			Eval minEval = new Eval(Double.POSITIVE_INFINITY, 0);
 			List<Move> legalMoves = Utils.generateLegalMoves(position);
 
 			// order moves
@@ -160,17 +233,17 @@ public class Engine {
 
 			for (Move move : legalMoves) {
 				position.makeMove(move);
-				double eval = minimaxABO(position, depth - 1, alpha, beta, true);
+				Eval eval = minimaxABO(position, depth - 1, alpha, beta, true);
 				position.undoMove();
 				
-				if (eval < minEval) {					
+				if (eval.lower(minEval)) {
 					minEval = eval;
 					if (depth == maxDepth) {
 						bestMove = move;
 					}
-				}				
+				}
 
-				beta = Math.min(beta, minEval);				
+				beta = Math.min(beta, minEval.eval);
 				if (beta <= alpha) {					
 					break;
 				}
@@ -232,7 +305,8 @@ public class Engine {
 		return legalMoves.size() == 0;
 	}
 
-	private static double staticEval(Position position) {
+	private static Eval staticEval(Position position) {
+		Eval eval = new Eval(0.0, Integer.MAX_VALUE);
 		double balance = 0.0;
 		
 		for (int i = 0; i < 64; i++) {
@@ -243,31 +317,34 @@ public class Engine {
 				balance -= pieceValues[Piece.name(position.at(i))];				
 			}
 		}		
-		return balance;
+		eval.eval = balance;
+		return eval;
 	}
 
 	private static void testEvaluation(String fen) {
-		Engine engine = new Engine(3);
+		Engine engine = new Engine(4);
 
 		Position pos = new Position(fen);
 		pos.printBoard();
 
-		double evalABO = engine.eval(pos, 2);
-		double balance = Engine.staticEval(pos);
+		Eval evalABO = engine.eval(pos, MINIMAX_ABO);
+		Eval balance = Engine.staticEval(pos);
 
 		System.out.println("ABO evaluation: " + evalABO);
-		System.out.println("Best move : " + engine.bestMove);
-		System.out.println("Static evaluation: " + balance);
+		System.out.println("Best move: " + engine.bestMove);
+		System.out.println("Static evaluation: " + balance.eval);
 	}
 
 	public static void main(String[] args) {
-		Position pos = new Position("r1bqkb1r/pppppppp/n7/4P3/2B5/5Q2/PPPP1PP/RNB1KBNR b KQkq - 0 1");
+		testEvaluation("r1bqkb1r/pppppppp/n7/4P3/2B5/5Q2/PPPP1PP/RNB1KBNR b KQkq - 0 1");
 
-		testEvaluation(pos.generateFEN());
+		// mate in 2
+		testEvaluation("4k3/8/8/R7/1R/8/7K/8 w - - 0 1");
 
-		pos.makeMove(new Move("h8g8"));
-		pos.makeMove(new Move("f3f7"));
+		// mate in 1 for white, black to play
+		testEvaluation("4k3/1R6/8/R7/8/8/7K/8 b - - 1 1");
 
-		System.out.println(Utils.generateLegalMoves(pos).size());
+		// mate in 1 for white, white to play
+		testEvaluation("3k4/1R6/8/R7/8/8/7K/8 w - - 2 2");
 	}
 }
